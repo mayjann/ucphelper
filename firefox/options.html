@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>UCP Helper — Настройки</title>
+    <link rel="stylesheet" href="css/options.css">
+    <link rel="stylesheet" href="css/sidebar.css">
+	<link rel="stylesheet" href="vendor/themify-icons/css/themify-icons.css">
+</head>
+<body>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+			<img src="icons/logo.png" alt="UCP Helper Logo" class="sidebar-logo">
+			<h1>UCP Helper</h1>
+		</div>
+        <nav class="sidebar-nav">
+			<a href="#">
+				<i class="ti-bell icon-notify" title="Уведомления"></i>
+				<span>Уведомления</span>
+			</a>
+
+			<a href="#">
+				<i class="ti-alert icon-badwords" title="Запрещённые слова"></i>
+				<span>Запрещённые слова</span>
+			</a>
+
+			<a href="#">
+				<i class="ti-write icon-templates" title="Шаблоны"></i>
+				<span>Шаблоны</span>
+			</a>
+		</nav>
+    </div>
+
+    <div class="main-wrapper" id="mainWrapper">
+        <header class="header">
+			<ul class="nav-left">
+				<li>
+					<button id="toggleSidebar" class="sidebar-toggle" type="button">
+						<i class="ti-menu"></i>
+					</button>
+				</li>
+			</ul>
+        </header>
+
+        <main class="container">
+			
+		</main>
+
+        <footer class="ucp-footer">
+            <a href="https://forum.gambit-rp.com/threads/565811/" target="_blank">UCP Helper v2.7</a>
+            <hr class="divider">
+            <div class="footer-line2">powered by</div>
+            <div class="footer-line3">
+                <a href="https://vk.com/enotixa_inc" target="_blank">Enotixa Inc.</a>
+                <span class="dot-separator">•</span>
+                <a href="https://forum.gambit-rp.com/members/91071/" target="_blank">h1ghway</a>
+                <span class="dot-separator">•</span>
+                <a href="https://forum.gambit-rp.com/members/101208/" target="_blank">mayjann</a>
+                <span class="dot-separator">•</span>
+                <a href="https://forum.gambit-rp.com/members/9750422/" target="_blank">jetroq</a>
+            </div>
+        </footer>
+    </div>
+
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="core/config.js"></script>
+	<script type="module" src="sidebar.js"></script>
+    <script type="module" src="options/options.js"></script>
+</body>
+</html>

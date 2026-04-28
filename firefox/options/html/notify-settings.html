@@ -1,0 +1,93 @@
+<section class="card">
+	<h2>Настройки уведомлений</h2>
+	
+	<hr class="dividerPrim">
+	<div class="toggles">
+		<label class="switch">
+			<input type="checkbox" id="autoUpdateUcp" aria-describedby="autoUpdateUcpHint">
+			<span class="slider"></span>
+
+			<span class="toggle-text tooltip">
+				Уведомление о наличии UCP заявлений
+				<span class="tooltip-text" id="autoUpdateUcpHint">Если включено, UCP Helper будет проверять наличие новых заявлений с заданным интервалом.</span>
+			</span>
+		</label>
+		
+		<label class="switch">
+			<input type="checkbox" id="quietHoursEnabled" aria-describedby="quietHoursEnabledHint">
+			<span class="slider"></span>
+
+			<span class="toggle-text tooltip">
+				Часы тишины
+				<span class="tooltip-text" id="quietHoursEnabledHint">Если включено, UCP Helper не будет создавать уведомления в заданный период.</span>
+			</span>
+		</label>
+		
+		<label class="switch">
+			<input type="checkbox" id="autoUpdateUcpTab" aria-describedby="autoUpdateUcpTabHint">
+			<span class="slider"></span>
+
+			<span class="toggle-text tooltip">
+				Автоматически обновлять вкладку
+				<span class="tooltip-text" id="autoUpdateUcpTabHint">Если открыт общий список заявлений, то он будет автоматически обновлен.</span>
+			</span>
+		</label>
+		
+		<label class="switch">
+			<input type="checkbox" id="autoUpdateOnlySound" aria-describedby="autoUpdateOnlySoundHint">
+			<span class="slider"></span>
+
+			<span class="toggle-text tooltip">
+				Использовать только звуковые уведомления
+				<span class="tooltip-text" id="autoUpdateOnlySoundHint">Если включено, то системные уведомления браузера будут отключены. Уведомления будут сопроваждаться исключительно мелодией.</span>
+			</span>
+		</label>
+	</div>
+	
+	<div class="form-group-container">
+		<div class="form-group">
+			<label for="updateInterval">Интервал проверки</label>
+			<div class="form-group-sub-container">
+				<select id="updateInterval" class="select">
+					<option value="1">1 минута</option>
+					<option value="2">2 минуты</option>
+					<option value="3">3 минуты</option>
+					<option value="5">5 минут</option>
+					<option value="10">10 минут</option>
+					<option value="15">15 минут</option>
+					<option value="30">30 минут</option>
+					<option value="45">45 минут</option>
+					<option value="60">60 минут</option>
+				</select>
+			</div>
+		</div>
+		
+		<div class="form-group">
+			<label for="quietHoursFrom">Часы тишины</label>
+
+			<div class="form-group-sub-container">
+				<input type="time" id="quietHoursFrom" class="time-input">
+				<span class="time-separator">:</span>
+				<input type="time" id="quietHoursTo" class="time-input">
+			</div>
+		</div>
+		
+		<div class="form-group">
+			<label for="AutoUpdateNotifySound">Мелодия уведомления</label>
+			
+			<div class="form-group-sub-container">
+				<select id="AutoUpdateNotifySound" class="select"></select>
+				<button id="playSoundBtn" class="btn btn-primary">Прослушать</button>
+			</div>
+		</div>
+		
+		<div class="form-group">
+			<label for="AutoUpdateNotifySoundVolume">Громкость уведомления</label>
+			<div class="form-group-sub-container">
+				<input type="range" id="AutoUpdateNotifySoundVolume" class="volume-slider" min="0" max="100" value="50">
+			</div>
+		</div>
+	</div>
+
+	<button id="saveGeneralBtn" class="btn btn-primary">Сохранить</button>
+</section>

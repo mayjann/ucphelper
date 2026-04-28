@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<title>UCP Helper</title>
+	<link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+    <div class="header-container">
+		<img src="icons/128.png" alt="UCP Helper Logo" class="header-logo">
+		<a href="options.html" class="btn btn-primary" target="_blank">Открыть настройки</a>
+	</div>
+	
+	<main class="main-container">
+		<div class="toggles">
+			<label class="switch">
+				<input type="checkbox" id="quietEnabled" aria-describedby="quietEnabledHint">
+				<span class="slider"></span>
+
+				<span class="toggle-text tooltip">
+					Не беспокоить
+					<span class="tooltip-text" id="quietEnabledHint">Если включено, уведомления буду приостановлены.</span>
+				</span>
+			</label>
+		</div>
+	</main>
+
+    <footer class="ucp-footer">
+        <div class="footer-line1">v2.7</div>
+        <hr class="divider">
+        <div class="footer-line2">powered by</div>
+        <div class="footer-line3">
+            <a href="https://vk.com/enotixa_inc" target="_blank">Enotixa Inc.</a>
+            <span class="dot-separator">•</span>
+            <a href="https://forum.gambit-rp.com/members/91071/" target="_blank">h1ghway</a>
+            <span class="dot-separator">•</span>
+            <a href="https://forum.gambit-rp.com/members/101208/" target="_blank">mayjann</a>
+			<span class="dot-separator">•</span>
+			<a href="https://forum.gambit-rp.com/members/9750422/" target="_blank">jetroq</a>
+        </div>
+    </footer>
+	
+	<script src="quietHandler.js"></script>
+</body>
+</html>

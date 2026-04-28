@@ -1,0 +1,120 @@
+<section class="card">
+
+	<h2>Настройки шаблонов</h2>
+
+	<div class="toggles">
+
+		<label class="switch">
+			<input type="checkbox" id="useTemplates">
+			<span class="slider"></span>
+			<span class="toggle-text">Использовать стандартные шаблоны при отклонении</span>
+		</label>
+
+		<label class="switch">
+			<input type="checkbox" id="useCustomTemplates">
+			<span class="slider"></span>
+			<span class="toggle-text">Использовать пользовательские шаблоны при отклонении</span>
+		</label>
+
+	</div>
+
+</section>
+
+<section class="card">
+	<h2>Шаблон запроса проверки на мультиаккаунт</h2>
+	<small style="opacity:.7;">
+		Доступные переменные: {{ucpLink}} — ссылка на UCP заявление, {{lk}} — личный кабинет игрока
+	</small>
+	<textarea id="ppTemplate" class="textareaSec" style="min-height:120px;"></textarea>
+	<div id="ppCounter" style="opacity:.7; font-size:12px; margin-top:6px;">
+		400/400 символов доступно для ввода
+	</div>
+</section>
+
+<section class="card" id="stockBlock" style="display:none;">
+	<details>
+		<summary><span>Стандартные шаблоны при отклонении</span></summary>
+
+		<section class="card">
+			<p>Имя знаменитости</p>
+			<textarea id="template_6" class="textareaSec"></textarea>
+		</section>
+
+		<section class="card">
+			<p>Несоответствие роли и квенты</p>
+			<textarea id="template_10" class="textareaSec"></textarea>
+		</section>
+
+		<section class="card">
+			<p>Сокращенное русское имя</p>
+			<textarea id="template_11" class="textareaSec"></textarea>
+		</section>
+
+		<section class="card">
+			<p>Мультиаккаунт</p>
+			<textarea id="template_17" class="textareaSec"></textarea>
+		</section>
+
+		<section class="card">
+			<p>Некорректный никнейм</p>
+			<textarea id="template_18" class="textareaSec"></textarea>
+		</section>
+
+		<section class="card">
+			<p>Вредитель</p>
+			<textarea id="template_19" class="textareaSec"></textarea>
+		</section>
+
+		<section class="card">
+			<p>Нестандартный персонаж</p>
+			<textarea id="template_20" class="textareaSec"></textarea>
+		</section>
+
+	</details>
+</section>
+
+
+<section class="card" id="customBlock" style="display:none;">
+	<details>
+		<summary><span>Пользовательские шаблоны при отклонении</span></summary>
+
+		<section class="card">
+			<div class="customTemplateCreate">
+				<select id="customTemplateReason" class="select">
+					<option value="6">Имя знаменитости</option>
+					<option value="10">Несоответствие роли и квенты</option>
+					<option value="11">Сокращенное русское имя</option>
+					<option value="17">Мультиаккаунт</option>
+					<option value="18">Некорректный никнейм</option>
+					<option value="19">Вредитель</option>
+					<option value="20">Нестандартный персонаж</option>
+				</select>
+
+				<button id="addCustomTemplate" class="btn btn-primary">Добавить</button>
+			</div>
+		</section>
+
+		<div id="customTemplatesList"></div>
+
+		<template id="customTemplateItem">
+			<section class="card customTemplate">
+
+				<div class="customGroupBody"></div>
+
+				<div class="customTemplateNameBlock">
+					<input type="text" class="customTemplateInput customTemplateName" placeholder="Название шаблона">
+					<span>Под этим названием шаблон будет виден при проверке UCP заявления</span>
+				</div>
+				<textarea class="textareaSec customTemplateText" placeholder="Текст шаблона"></textarea>
+
+				<button class="btn btn-danger removeTemplate">Удалить</button>
+			</section>
+		</template>
+
+	</details>
+</section>
+
+
+<section class="card">
+	<button id="saveTemplatesBtn" class="btn btn-primary">Сохранить</button>
+</section>

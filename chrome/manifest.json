@@ -1,0 +1,71 @@
+{
+  "manifest_version": 3,
+  "name": "UCP Helper",
+  "description": "Упростит проверку UCP заявок! Powered by Enotixa Inc. & h1ghway & mayjann & jetrorq",
+  "version": "2.7",
+
+  "icons": {
+    "16": "icons/16.png",
+    "32": "icons/32.png",
+    "48": "icons/48.png",
+    "128": "icons/128.png"
+  },
+
+  "action": {
+    "default_popup": "main.html"
+  },
+
+  "options_page": "options.html",
+
+  "content_scripts": [
+    {
+      "matches": ["https://admin.gambit-rp.com/*"],
+      "js": [
+				"core/config.js",
+				"core/utils.js",
+				"core/styles.js",
+				"core/parser.js",
+				"core/init.js",
+				"core/badWordsLoader.js",
+				"core/nameRules.js",
+				"core/highlightText.js",
+				"core/auditFlags.js",
+				"core/observer.js",
+				"core/reasonSanitizer.js",
+				"modules/base/ui.js",
+				"modules/base/checkPlayerBans.js",
+				"modules/base/autoTemplates.js",
+				"modules/base/customTemplates.js",
+				"modules/base/checkCreateLimit.js",
+				"modules/base/ApproveSubmitIfTooFast.js",
+				"modules/base/audit.js",
+				"modules/ooc/accountNickname.js",
+				"modules/ooc/accountEmail.js",
+				"modules/ooc/accountIPBan.js",
+				"modules/ooc/accountRookie.js",
+				"modules/ic/characterName.js",
+				"modules/ic/characterNation.js",
+				"modules/ic/characterSkin.js",
+				"modules/ic/characterQuenta.js",
+				"main.js"
+			],
+      "run_at": "document_idle"
+    }
+  ],
+
+  "permissions": [
+    "storage",
+    "tabs",
+    "notifications",
+	"alarms",
+	"offscreen"
+  ],
+
+  "host_permissions": [
+    "https://admin.gambit-rp.com/*"
+  ],
+
+  "background": {
+    "service_worker": "workers/ucpChecker.js"
+  }
+}
