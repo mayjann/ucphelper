@@ -71,7 +71,9 @@
 		"https://raw.githubusercontent.com/*",
 		"storage",
 		"tabs",
-		"notifications"
+		"notifications",
+		"alarms",
+		"scripting"
 	],
 	
 	"background": {

@@ -54,11 +54,12 @@
   ],
 
   "permissions": [
+    "scripting",
     "storage",
     "tabs",
     "notifications",
-	"alarms",
-	"offscreen"
+    "alarms",
+    "offscreen"
   ],
 
   "host_permissions": [
@@ -66,6 +67,6 @@
   ],
 
   "background": {
-    "service_worker": "workers/ucpChecker.js"
+    "service_worker": "workers/background_worker.js"
   }
 }

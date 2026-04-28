@@ -211,6 +211,14 @@ function injectStyles() {
             margin-bottom: 10px;
         }
 
+        .ucp-modal-subtitle {
+            font-size:14px;
+            margin-top:-6px;
+            margin-bottom:12px;
+            color:#f1c40f;
+            font-weight:600;
+        }
+
         .ucp-modal-text {
             font-size: 13px;
             line-height: 1.5;
