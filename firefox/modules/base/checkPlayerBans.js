@@ -22,7 +22,7 @@ function applyBadges(result) {
             const logs = data.logs || [];
 
             const activeBan = (data.punishment || []).find(p =>
-                p.type === "accban" || p.type === "ban"
+                ["accban", "iban", "ban"].includes((p.type || "").toLowerCase())
             );
 
             const content = Array.from(nameCell.childNodes);
@@ -34,6 +34,19 @@ function applyBadges(result) {
             content.forEach(node => wrapper.appendChild(node));
 
             if (activeBan) {
+                const type = (activeBan.type || "").toLowerCase();
+
+                const badgeMap = {
+                    accban: { text: "ACCBAN", class: "ucp-tb-accban" },
+                    iban:   { text: "PERMANENT", class: "ucp-tb-perm" },
+                    ban:    { text: "BAN", class: "ucp-tb-temp" }
+                };
+
+                const cfg = badgeMap[type] || {
+                    text: "BAN",
+                    class: "ucp-tb-temp"
+                };
+
                 const bestLog = {
                     player: name,
                     admin: activeBan.admin || "?",
@@ -43,8 +56,8 @@ function applyBadges(result) {
                 };
 
                 const badge = createModalBadge({
-                    text: "PERMANENT",
-                    bgClass: "ucp-tb-perm",
+                    text: cfg.text,
+                    bgClass: cfg.class,
                     mode: "ban",
                     data: bestLog,
                     history: logs
@@ -57,7 +70,7 @@ function applyBadges(result) {
             else if (logs.length) {
                 const badge = createModalBadge({
                     text: "ИСТОРИЯ БЛОКИРОВОК",
-                    bgClass: "ucp-tb-temp",
+                    bgClass: "ucp-tb-history",
                     mode: "history",
                     player: name,
                     history: logs
@@ -132,7 +145,7 @@ async function checkOtherAccounts() {
             getPunishmentData(urlPunishment)
         ]);
 
-        let hasActiveBan = false;
+        let hasActiveACCBan = false;
         let isGriefer = false;
         let recentBanCount = 0;
 
@@ -142,7 +155,7 @@ async function checkOtherAccounts() {
             const type = (b.type || "").toLowerCase();
 
             if (type === "accban") {
-                hasActiveBan = true;
+                hasActiveACCBan = true;
             }
 
             if (isGrieferReason(b.reason || "")) {
@@ -157,7 +170,7 @@ async function checkOtherAccounts() {
             }
         }
 
-        if (hasActiveBan) {
+        if (hasActiveACCBan) {
             setAuditFlag("BASE_ACCOUNT_HAS_ACTIVE_ACCBAN", true);
         }
 

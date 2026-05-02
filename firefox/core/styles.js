@@ -24,16 +24,17 @@ function injectStyles() {
 
         .ucp-table-badge {
             display: inline-flex; align-items: center; justify-content: center;
-            height: 18px; padding: 0 6px; margin-left: 8px; border-radius: 3px;
+            height: 18px; min-width: 80px; padding: 0 6px; margin-left: 8px; border-radius: 3px;
             font-family: 'Roboto', sans-serif; font-size: 10px; font-weight: 700;
-            text-transform: uppercase; color: #fff; cursor: help; white-space: nowrap;
-            transform: translateY(-1px); box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            text-transform: uppercase; color: #fff; white-space: nowrap;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2); flex-shrink: 0; flex-grow: 0;
         }
         
         .ucp-tb-accban { background-color: #212529; border: 1px solid #dc3545; color: #ff6b6b; }
         .ucp-tb-perm { background-color: #c0392b; border: 1px solid #a93226; }
         .ucp-tb-pk { background-color: #d35400; border: 1px solid #ba4a00; cursor: default; }
         .ucp-tb-temp { background-color: #5d6d7e; border: 1px solid #4b5866; }
+        .ucp-tb-history { background-color: #0151a6; border: 1px solid #003c7d; }
 
         .ucp-name-flex { display: flex !important; align-items: center !important; flex-wrap: nowrap !important; }
         .ucp-name-flex a { color: #fff !important; font-weight: 600; margin-right: 5px; text-decoration: none; }
