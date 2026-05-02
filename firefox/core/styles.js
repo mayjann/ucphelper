@@ -36,7 +36,7 @@ function injectStyles() {
         .ucp-tb-temp { background-color: #5d6d7e; border: 1px solid #4b5866; }
 
         .ucp-name-flex { display: flex !important; align-items: center !important; flex-wrap: nowrap !important; }
-        .ucp-name-flex a { color: #fff !important; font-weight: 600; margin-right: 5px; text-decoration: none; }
+        .ucp-name-flex a { margin-right: 5px; text-decoration: none; }
 
         .ucp-google-btn {
             display: inline-flex; align-items: center; justify-content: center;
