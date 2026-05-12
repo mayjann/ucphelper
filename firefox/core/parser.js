@@ -1,4 +1,4 @@
-async function getBanDataFromUrl(url, playerName) {
+export async function getBanDataFromUrl(url, playerName) {
     const res = await fetch(url, { credentials: "include" });
     const html = await res.text();
 
@@ -55,7 +55,7 @@ async function getBanDataFromUrl(url, playerName) {
     return bans;
 }
 
-async function getPunishmentData(url) {
+export async function getPunishmentData(url) {
     const res = await fetch(url, { credentials: "include" });
     const html = await res.text();
 

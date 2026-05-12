@@ -38,34 +38,12 @@ function compareVersions(v1, v2) {
   return 0;
 }
 
-async function checkExtensionUpdate() {
-    const res = await fetch(
-      `https://api.github.com/repos/${REPO}/releases/latest`
-    );
-
-    if (!res.ok) {
-      return;
-    }
-
-    const data = await res.json();
-
-    const latestVersion = data.tag_name;
-    const currentVersion = chrome.runtime.getManifest().version;
-
-    const isNew = compareVersions(latestVersion, currentVersion) > 0;
-
-    await browser.storage.local.set({
-      ucp_update_available: isNew,
-      ucp_latest_version: latestVersion
-    });
-}
-
 const UCP_URL = "https://admin.gambit-rp.com/ucp";
 
 let autoUpdateUcpInterval = null;
 
 async function updateTimer() {
-    const storage = await browser.storage.sync.get([ "autoUpdateUcp", "autoUpdateUcpTimeout", ]);
+  const storage = await browser.storage.sync.get([ "autoUpdateUcp", "autoUpdateUcpTimeout", ]);
 	const autoUpdateUcp = storage.autoUpdateUcp ?? false;
 	const autoUpdateUcpTimeout = storage.autoUpdateUcpTimeout ?? 300;
 
@@ -165,22 +143,12 @@ async function sendNotification(text) {
     }
 }
 
-function initVersionCheck() {
-  browser.alarms.create("versionCheck", {
-    periodInMinutes: 60
-  });
-
-  checkExtensionUpdate();
-}
-
 browser.runtime.onInstalled.addListener(() => {
     updateTimer();
-	initVersionCheck();
 });
 
 browser.runtime.onStartup.addListener(() => {
     updateTimer();
-	initVersionCheck();
 });
 
 browser.storage.onChanged.addListener((changes, area) => {
@@ -196,60 +164,69 @@ browser.alarms.onAlarm.addListener((alarm) => {
 	}
 });
 
+
 browser.tabs.onUpdated.addListener(async (tabId, info, tab) => {
-  if (!tab.url || !tab.url.startsWith(UCP_URL)) return;
+  if (!tab.url?.startsWith(UCP_URL)) return;
   if (info.status !== "complete") return;
 
-  const {
-    ucp_update_available,
-    ucp_latest_version
-  } = await browser.storage.local.get([
-    "ucp_update_available",
-    "ucp_latest_version"
-  ]);
+  try {
+    const res = await fetch(
+      `https://api.github.com/repos/${REPO}/releases/latest`
+    );
 
-  if (!ucp_update_available) return;
+    if (!res.ok) return;
 
-  browser.scripting.executeScript({
-    target: { tabId },
-    func: (version) => {
+    const data = await res.json();
 
-      if (document.getElementById("ucp-update-modal")) return;
+    const latestVersion = data.tag_name;
+    const currentVersion = chrome.runtime.getManifest().version;
 
-      const overlay = document.createElement("div");
-      overlay.id = "ucp-update-modal";
-      overlay.className = "ucp-modal-overlay";
+    const isNew = compareVersions(latestVersion, currentVersion) > 0;
 
-      overlay.innerHTML = `
-        <div class="ucp-modal-content">
-          <div class="ucp-modal-title">UCP Helper</div>
-          <div class="ucp-modal-subtitle">Доступно обновление</div>
+    if (!isNew) return;
 
-          <div class="ucp-modal-text">
-            Доступна новая версия расширения <b>${version}</b><br><br>
+    browser.scripting.executeScript({
+      target: { tabId },
+      func: (version) => {
+        if (document.getElementById("ucp-update-modal")) return;
 
-            <a 
-              href="https://github.com/mayjann/ucphelper/releases/latest"
-              target="_blank"
-              style="color:#4dabf7;text-decoration:underline"
-            >
-              Перейти на страницу релиза
-            </a>
+        const overlay = document.createElement("div");
+        overlay.id = "ucp-update-modal";
+        overlay.className = "ucp-modal-overlay";
+
+        overlay.innerHTML = `
+          <div class="ucp-modal-content">
+            <div class="ucp-modal-title">UCP Helper</div>
+            <div class="ucp-modal-subtitle">Доступно обновление</div>
+
+            <div class="ucp-modal-text">
+              Доступна новая версия расширения <b>${version}</b><br><br>
+
+              <a 
+                href="https://github.com/mayjann/ucphelper/releases/latest"
+                target="_blank"
+                style="color:#4dabf7;text-decoration:underline"
+              >
+                Перейти на страницу релиза
+              </a>
+            </div>
+
+            <button class="ucp-modal-btn" id="ucpUpdateCloseBtn">
+              Закрыть
+            </button>
           </div>
+        `;
 
-          <button class="ucp-modal-btn" id="ucpUpdateCloseBtn">
-            Закрыть
-          </button>
-        </div>
-      `;
+        document.body.appendChild(overlay);
 
-      document.body.appendChild(overlay);
+        document.getElementById("ucpUpdateCloseBtn").onclick = () => {
+          overlay.remove();
+        };
+      },
+      args: [latestVersion]
+    });
 
-      document.getElementById("ucpUpdateCloseBtn").onclick = () => {
-        overlay.remove();
-      };
-
-    },
-    args: [ucp_latest_version]
-  });
+  } catch (err) {
+    console.error("[UCP] update check error:", err);
+  }
 });

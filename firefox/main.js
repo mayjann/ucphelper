@@ -1,33 +1,19 @@
+import { UI } from "./modules/base/ui/index.js";
+import { Modules } from "./modules/index.js";
+import { startObserver } from "./core/observer.js";
+import { initApp } from "./core/init.js";
+
 async function checkers() {
     if (!/^\/ucp\/\d+$/.test(location.pathname)) return;
 
-    // Base Checkers
-    // hideApproveSubmitIfTooFast();
-    initTemplateWatcher();
-    checkCreateLimit();
-    checkOtherAccounts();
-
-    // OOC Checkers
-    checkAccountNickname();
-    checkAccountEmail();
-    checkAccountIPBan();
-    await getFirstPlayerRegDate();
-
-    // IC Checkers
-    checkCharacterName();
-    checkCharacterNation();
-    watchSkinImages();
-    processQuenta();
-
-    renderAuditWidget();
-    CustomTemplateWatcher();
-    initStatusLogger();
+    await Modules.runBase();
+    await Modules.runOOC();
+    await Modules.runIC();
+    UI.renderAuditWidget();
 }
 
-async function bootstrap() {
-    const ok = await initApp();
+async function bootstrap() { const ok = await initApp();
     if (!ok) return;
-
     await checkers();
     startObserver(checkers);
 }

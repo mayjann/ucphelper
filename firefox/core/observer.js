@@ -1,25 +1,16 @@
-function startObserver(checkers) {
+export function startObserver(checkers) {
     let lastRun = 0;
     const COOLDOWN = 60 * 1000;
 
     const isIgnored = (node) =>
         node?.closest?.("#audit-widget") ||
         node?.closest?.("#audit-panel") ||
-        
-        node?.closest?.("#customTemplateSelectWrapper") ||
-        node?.closest?.("#customTemplateWarning") ||
-        node?.closest?.(".customTemplate") ||
-        node?.closest?.(".customGroup") ||
-
+        node?.closest?.(".ucp-name-flex") ||
+        node?.closest?.(".ucp-modal-overlay") ||
         node?.matches?.(".ucp-name-flex") ||
         node?.matches?.(".ucp-modal-overlay") ||
-        node?.matches?.(".customTemplate") ||
-        node?.matches?.(".customGroup") ||
-
         node?.querySelector?.(".ucp-name-flex") ||
-        node?.querySelector?.(".ucp-modal-overlay") ||
-        node?.querySelector?.(".customTemplate") ||
-        node?.querySelector?.(".customGroup");
+        node?.querySelector?.(".ucp-modal-overlay");
 
     const observer = new MutationObserver((mutations) => {
         const now = Date.now();

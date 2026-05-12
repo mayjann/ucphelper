@@ -1,3 +1,8 @@
+import { getBanDataFromUrl, getPunishmentData } from "../../core/parser.js";
+import { UI } from "./ui/index.js";
+import { setAuditFlag } from "./audit.js";
+
+
 function applyBadges(result) {
     const tables = document.querySelectorAll("table");
 
@@ -22,7 +27,7 @@ function applyBadges(result) {
             const logs = data.logs || [];
 
             const activeBan = (data.punishment || []).find(p =>
-                ["accban", "iban", "ban"].includes((p.type || "").toLowerCase())
+                p.type === "accban" || p.type === "ban"
             );
 
             const content = Array.from(nameCell.childNodes);
@@ -34,19 +39,6 @@ function applyBadges(result) {
             content.forEach(node => wrapper.appendChild(node));
 
             if (activeBan) {
-                const type = (activeBan.type || "").toLowerCase();
-
-                const badgeMap = {
-                    accban: { text: "ACCBAN", class: "ucp-tb-accban" },
-                    iban:   { text: "PERMANENT", class: "ucp-tb-perm" },
-                    ban:    { text: "BAN", class: "ucp-tb-temp" }
-                };
-
-                const cfg = badgeMap[type] || {
-                    text: "BAN",
-                    class: "ucp-tb-temp"
-                };
-
                 const bestLog = {
                     player: name,
                     admin: activeBan.admin || "?",
@@ -55,29 +47,29 @@ function applyBadges(result) {
                     reason: activeBan.reason || "Perm"
                 };
 
-                const badge = createModalBadge({
-                    text: cfg.text,
-                    bgClass: cfg.class,
+                const badge = UI.createModalBadge({
+                    text: "PERMANENT",
+                    bgClass: "ucp-tb-perm",
                     mode: "ban",
                     data: bestLog,
                     history: logs
                 });
 
                 wrapper.appendChild(badge);
-                applyRowState(row, "ban");
+                UI.applyRowState(row, "ban");
             }
 
             else if (logs.length) {
-                const badge = createModalBadge({
+                const badge = UI.createModalBadge({
                     text: "ИСТОРИЯ БЛОКИРОВОК",
-                    bgClass: "ucp-tb-history",
+                    bgClass: "ucp-tb-temp",
                     mode: "history",
                     player: name,
                     history: logs
                 });
 
                 wrapper.appendChild(badge);
-                applyRowState(row, "clean");
+                UI.applyRowState(row, "clean");
             }
 
             nameCell.appendChild(wrapper);
@@ -126,7 +118,7 @@ function getOtherAccountIds() {
 }
 
 
-async function checkOtherAccounts() {
+export async function checkOtherAccounts() {
     const accounts = getOtherAccountIds();
     const result = {};
 
@@ -145,7 +137,7 @@ async function checkOtherAccounts() {
             getPunishmentData(urlPunishment)
         ]);
 
-        let hasActiveACCBan = false;
+        let hasActiveBan = false;
         let isGriefer = false;
         let recentBanCount = 0;
 
@@ -155,7 +147,7 @@ async function checkOtherAccounts() {
             const type = (b.type || "").toLowerCase();
 
             if (type === "accban") {
-                hasActiveACCBan = true;
+                hasActiveBan = true;
             }
 
             if (isGrieferReason(b.reason || "")) {
@@ -170,7 +162,7 @@ async function checkOtherAccounts() {
             }
         }
 
-        if (hasActiveACCBan) {
+        if (hasActiveBan) {
             setAuditFlag("BASE_ACCOUNT_HAS_ACTIVE_ACCBAN", true);
         }
 

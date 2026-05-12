@@ -1,4 +1,8 @@
-function checkCreateLimit() {
+import { Utils } from "../../core/utils/index.js";
+import { setAuditFlag } from "./audit.js";
+
+
+export async function checkCreateLimit() {
     let currentRegDate = null;
     
     const allThs = document.getElementsByTagName("th");
@@ -7,7 +11,7 @@ function checkCreateLimit() {
             const parentTable = th.closest("table");
             if (parentTable && !parentTable.innerText.includes("Другие аккаунты")) {
                 const dateCell = th.nextElementSibling;
-                if (dateCell) currentRegDate = parseFullRegDate(dateCell.innerText);
+                if (dateCell) currentRegDate = Utils.parseFullRegDate(dateCell.innerText);
                 break;
             }
         }
@@ -27,7 +31,7 @@ function checkCreateLimit() {
 
 
                 if (regCell && currentRegDate) {
-                    const otherDate = parseFullRegDate(regCell.innerText);
+                    const otherDate = Utils.parseFullRegDate(regCell.innerText);
                     if (otherDate) {
                         const diffMs = Math.abs(currentRegDate - otherDate);
                         const diffHours = diffMs / (1000 * 60 * 60);

@@ -1,3 +1,7 @@
+import { FORBIDDEN_SKINS, BLACK_SKINS } from "../../core/config.js";
+import { setAuditFlag } from "../base/audit.js";
+
+
 async function validateSkin(img, isUcpPage = true) {
     if (!img || !img.src.includes("/skins/")) return;
 
@@ -50,7 +54,7 @@ async function validateSkin(img, isUcpPage = true) {
     img.title = `${skinText}\n${colorText}`;
 }
 
-function watchSkinImages() {
+export async function watchSkinImages() {
     const observer = new MutationObserver((mutations) => {
         for (let mutation of mutations) {
             if (!mutation.addedNodes) continue;

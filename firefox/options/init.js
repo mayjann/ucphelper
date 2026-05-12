@@ -10,7 +10,6 @@ export const NOTIFY_SOUNDS = [
 
 export const DEFAULT_SETTINGS = {
     useTemplates: true,
-    autoUpdateUcpTab: true,
 	autoUpdateUcp: false,
 	autoUpdateUcpTab: true,
 	autoUpdateUcpTimeout: 300,
@@ -28,12 +27,7 @@ export const DEFAULT_SETTINGS = {
         18: 'Никнейм нарушает правила сервера или в нем допущена ошибка. Проверьте никнейм',
         19: 'Одобрение через форумную жалобу на мое имя: https://forum.gambit-rp.com/forums/64',
         20: 'Квента соответствует нестандартному персонажу, который требует одобрения на форуме'
-    },
-    customTemplates: {},
-    ppTemplate: `Ссылка на UCP: {{ucpLink}}
-ЛК: {{lk}}
-
-Новорег, прошу проверить на 26пп`
+    }
 };
 
 export async function initDefaults(storage) {
@@ -66,9 +60,6 @@ export async function initDefaults(storage) {
 	
 	if (storage.quietEnabled === undefined)
         defaultsToSet.quietEnabled = DEFAULT_SETTINGS.quietEnabled;
-
-    if (storage.ppTemplate === undefined)
-        defaultsToSet.ppTemplate = DEFAULT_SETTINGS.ppTemplate;
 
     if (Object.keys(defaultsToSet).length > 0) {
         await browser.storage.sync.set(defaultsToSet);
