@@ -2,7 +2,7 @@ async function checkers() {
     if (!/^\/ucp\/\d+$/.test(location.pathname)) return;
 
     // Base Checkers
-    hideApproveSubmitIfTooFast();
+    // hideApproveSubmitIfTooFast();
     initTemplateWatcher();
     checkCreateLimit();
     checkOtherAccounts();
