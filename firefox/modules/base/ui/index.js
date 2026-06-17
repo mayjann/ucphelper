@@ -2,7 +2,7 @@ import * as Core from "./core.js";
 import * as Modal from "./modal.js";
 import * as Widget from "./widget.js";
 import * as Loader from "./loader.js";
-
+import * as CopyButton from "./requestsCopyButton.js"
 
 export class UI {
     static createBadge = Core.createBadge;
@@ -15,4 +15,5 @@ export class UI {
     static refreshAuditWidget = Widget.refreshAuditWidget;
     static showLoader = Loader.showLoader;
     static hideLoader = Loader.hideLoader;
+    static makeLcClickable = CopyButton.makeLcClickable;
 }
