@@ -4,18 +4,34 @@ import { startObserver } from "./core/observer.js";
 import { initApp } from "./core/init.js";
 
 async function checkers() {
-    if (!/^\/ucp\/\d+$/.test(location.pathname)) return;
+    const isUcpPage = /^\/ucp\/\d+$/.test(location.pathname);
+    const isRequestPage = location.pathname.startsWith("/requests");
 
-    UI.showLoader();
+    if (!isUcpPage && !isRequestPage) return;
+
+    const needLoader = isUcpPage;
 
     try {
-        await Modules.runBase();
-        await Modules.runOOC();
-        await Modules.runIC();
+        if (needLoader) {
+            UI.showLoader();
+        }
 
-        UI.renderAuditWidget();
+        if (isUcpPage) {
+            await Modules.runBase();
+            await Modules.runOOC();
+            await Modules.runIC();
+
+            UI.renderAuditWidget();
+        }
+
+        if (isRequestPage) {
+            UI.makeLcClickable();
+        }
+
     } finally {
-        UI.hideLoader();
+        if (needLoader) {
+            UI.hideLoader();
+        }
     }
 }
 
