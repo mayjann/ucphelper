@@ -119,25 +119,78 @@ function formatDuration(duration) {
 }
 
 function showBanHistoryModal(player, history = []) {
-    const rows = history.length
-        ? history.map(h => `
-            <tr class="ucp-history-row">
-                <td>${h.admin || "?"}</td>
-                <td>${formatDuration(h.duration  || "")}</td>
-                <td>${linkifyReason(h.reason || "")}</td>
-                <td>${h.dateStr || h.date || "—"}</td>
-            </tr>
-        `).join("")
-        : `<tr><td colspan="5" style="text-align:center;padding:10px">История блокировок отсутсвует</td></tr>`;
+    const filters = [
+        "all",
+        "jail",
+        "warn",
+        "ban",
+        "iban",
+        "accban"
+    ];
+
+    let activeFilter = localStorage.getItem("ucp-ban-history-filter") || "all";
+
+    const getFilteredHistory = () => {
+        return activeFilter === "all"
+            ? history
+            : history.filter(h => h.type === activeFilter);
+    };
+
+    const renderRows = () => {
+        const filtered = getFilteredHistory();
+
+        return filtered.length
+            ? filtered.map(h => `
+                <tr class="ucp-history-row">
+                    <td>${h.type || "?"}</td>
+                    <td>${h.admin || "?"}</td>
+                    <td>${formatDuration(h.duration || "")}</td>
+                    <td>${linkifyReason(h.reason || "")}</td>
+                    <td>${h.dateStr || h.date || "—"}</td>
+                </tr>
+            `).join("")
+            : `
+                <tr>
+                    <td colspan="5" style="text-align:center;padding:10px">
+                        История блокировок отсутствует
+                    </td>
+                </tr>
+            `;
+    };
+
+    const renderFilters = () => {
+        return filters.map(type => `
+            <button 
+                class="ucp-history-filter ${activeFilter === type ? "active" : ""}"
+                data-filter="${type}">
+                ${type === "all" ? "Все" : type}
+            </button>
+        `).join("");
+    };
+
 
     const modal = openModal(`
-        <div class="ucp-modal-title">ИСТОРИЯ БЛОКИРОВОК ${player}</div>
+        <div class="ucp-modal-title">
+            <h1>${player}</h1>
+            <h2>ИСТОРИЯ БЛОКИРОВОК</h2>
+        </div>
+
+        <div class="ucp-history-filters">
+            <div>
+                ${renderFilters()}
+            </div>
+
+            <a id="historyCount">
+                Всего: ${getFilteredHistory().length}
+            </a>
+        </div>
+
 
         <div style="max-height:400px;overflow:auto">
-
             <table class="ucp-history-table">
                 <thead>
                     <tr>
+                        <th>Тип</th>
                         <th>Администратор</th>
                         <th>Срок</th>
                         <th>Причина</th>
@@ -145,15 +198,51 @@ function showBanHistoryModal(player, history = []) {
                     </tr>
                 </thead>
 
-                <tbody>
-                    ${rows}
+                <tbody id="historyBody">
+                    ${renderRows()}
                 </tbody>
             </table>
-
         </div>
 
-        <button class="ucp-modal-btn" id="closeModalBtn">Закрыть</button>
+        <button class="ucp-modal-btn" id="closeModalBtn">
+            Закрыть
+        </button>
     `, 900);
+
+
+    const updateFilterState = () => {
+        modal.querySelectorAll(".ucp-history-filter")
+            .forEach(btn => {
+                btn.classList.toggle(
+                    "active",
+                    btn.dataset.filter === activeFilter
+                );
+            });
+
+
+        const filtered = getFilteredHistory();
+
+        modal.querySelector("#historyBody").innerHTML = renderRows();
+
+        modal.querySelector("#historyCount").textContent =
+            `Всего: ${filtered.length}`;
+    };
+
+
+    modal.querySelectorAll(".ucp-history-filter")
+        .forEach(btn => {
+            btn.onclick = () => {
+                activeFilter = btn.dataset.filter;
+
+                localStorage.setItem(
+                    "ucp-ban-history-filter",
+                    activeFilter
+                );
+
+                updateFilterState();
+            };
+        });
+
 
     modal.querySelector("#closeModalBtn").onclick = closeModal;
 }
