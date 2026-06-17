@@ -20,3 +20,35 @@ export let ALL_BAD_WORDS = [...BASE_BAD_WORDS];
 export const disposableDomains = new Set();
 
 let banAlertShown = false;
+
+export const NOTIFY_SOUNDS = [
+    { file: "sound1.mp3", name: "Мелодия 1" },
+    { file: "sound2.mp3", name: "Мелодия 2" },
+    { file: "sound3.mp3", name: "Мелодия 3" },
+    { file: "sound4.mp3", name: "Мелодия 4" },
+    { file: "sound5.mp3", name: "Мелодия 5" },
+    { file: "sound6.mp3", name: "Мелодия 6" },
+    { file: "sound7.mp3", name: "Мелодия 7" }
+];
+
+export const DEFAULT_SETTINGS = {
+    useTemplates: true,
+    autoUpdateUcp: false,
+    autoUpdateUcpTab: true,
+    autoUpdateUcpTimeout: 300,
+    autoUpdateOnlySound: false,
+    AutoUpdateNotifySound: NOTIFY_SOUNDS[1].file,
+    AutoUpdateNotifySoundVolume: 75,
+    quietHoursEnabled: false,
+    quietHours: { from: "23:00", to: "08:00" },
+    quietEnabled: false,
+    templates: {
+        6: 'Пожалуйста, не используйте имя знаменитостей',
+        10: 'Пожалуйста, перепиши квенту: укажи слабые/сильные стороны, страхи, хобби и развлечения и другое',
+        11: 'Не используйте сокращенные русские имена, смените их на полные. К примеру: "Миша" - "Михаил"',
+        17: 'Запрещено регистрировать больше одного персонажа в сутки',
+        18: 'Никнейм нарушает правила сервера или в нем допущена ошибка. Проверьте никнейм',
+        19: 'Одобрение через форумную жалобу на мое имя: https://forum.gambit-rp.com/forums/64',
+        20: 'Квента соответствует нестандартному персонажу, который требует одобрения на форуме'
+    }
+};
