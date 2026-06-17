@@ -109,11 +109,20 @@ function showBanModal(data, banHistory = []) {
     }
 }
 
-function formatDuration(duration) {
+function formatDuration(duration, type = null) {
     const d = Number(duration);
 
-    if (!d || d <= 0) return "0 дн.";
-    if (d >= 9999) return "Навсегда";
+    if (!d || d <= 0) {
+        return "—";
+    }
+
+    if (type === "jail") {
+        return `${d} мин.`;
+    }
+
+    if (d >= 9999) {
+        return "Навсегда";
+    }
 
     return `${d} дн.`;
 }
@@ -144,7 +153,7 @@ function showBanHistoryModal(player, history = []) {
                 <tr class="ucp-history-row">
                     <td>${h.type || "?"}</td>
                     <td>${h.admin || "?"}</td>
-                    <td>${formatDuration(h.duration || "")}</td>
+                    <td>${formatDuration(h.duration || "", h.type)}</td>
                     <td>${linkifyReason(h.reason || "")}</td>
                     <td>${h.dateStr || h.date || "—"}</td>
                 </tr>
