@@ -3,6 +3,19 @@ export function startObserver(checkers) {
     const COOLDOWN = 60 * 1000;
 
     const isIgnored = (node) =>
+        (
+            node.tagName === "UL" &&
+            !node.id &&
+            !node.className &&
+            !node.children.length &&
+            !node.textContent.trim()
+        ) ||
+        node?.closest?.(".nav-item.dropdown") ||
+        node?.matches?.(".nav-item.dropdown") ||
+        node?.querySelector?.(".nav-item.dropdown") ||
+        node?.closest?.(".dropdown-menu") ||
+        node?.matches?.(".dropdown-menu") ||
+        node?.querySelector?.(".dropdown-menu") ||
         node?.closest?.("#audit-widget") ||
         node?.closest?.("#audit-panel") ||
         node?.closest?.(".ucp-name-flex") ||
