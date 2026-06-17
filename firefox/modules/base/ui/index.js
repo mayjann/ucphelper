@@ -1,6 +1,7 @@
 import * as Core from "./core.js";
 import * as Modal from "./modal.js";
 import * as Widget from "./widget.js";
+import * as Loader from "./loader.js";
 
 
 export class UI {
@@ -12,4 +13,6 @@ export class UI {
     static createModalBadge = Modal.createModalBadge;
     static renderAuditWidget = Widget.renderAuditWidget;
     static refreshAuditWidget = Widget.refreshAuditWidget;
+    static showLoader = Loader.showLoader;
+    static hideLoader = Loader.hideLoader;
 }
