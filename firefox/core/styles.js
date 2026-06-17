@@ -263,6 +263,66 @@ export function injectStyles() {
         .ucp-history-row:hover {
             background: rgba(255,255,255,0.06);
         }
+
+        .ucp-loader {
+            position: fixed;
+            inset: 0;
+            z-index: 2147483647;
+        }
+
+        .ucp-loader-backdrop {
+            position: absolute;
+            inset: 0;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+        }
+
+        .ucp-loader-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .ucp-loader-spinner {
+            width: 72px;
+            height: 72px;
+
+            border: 6px solid rgba(255, 255, 255, 0.15);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+
+            animation: ucp-loader-spin 0.8s linear infinite;
+
+            box-shadow:
+                0 0 25px rgba(255, 255, 255, 0.15),
+                inset 0 0 15px rgba(255, 255, 255, 0.05);
+        }
+
+        .ucp-loader-text {
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-align: center;
+
+            text-shadow: 0 0 10px rgba(255,255,255,.25);
+        }
+
+        @keyframes ucp-loader-spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
     `;
     document.head.appendChild(style);
 }
