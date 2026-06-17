@@ -16,6 +16,12 @@ export function startObserver(checkers) {
         node?.closest?.(".dropdown-menu") ||
         node?.matches?.(".dropdown-menu") ||
         node?.querySelector?.(".dropdown-menu") ||
+        node?.closest?.(".ucp-request-btn") ||
+        node?.matches?.(".ucp-request-btn") ||
+        node?.querySelector?.(".ucp-request-btn") ||
+        node?.closest?.(".ucp-copy-popup") ||
+        node?.matches?.(".ucp-copy-popup") ||
+        node?.querySelector?.(".ucp-copy-popup") ||
         node?.closest?.("#audit-widget") ||
         node?.closest?.("#audit-panel") ||
         node?.closest?.(".ucp-name-flex") ||
