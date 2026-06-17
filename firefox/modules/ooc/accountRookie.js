@@ -83,7 +83,7 @@ export async function getFirstPlayerRegDate() {
                     const td = row.querySelector('td');
 
                     if (th?.textContent.trim() === 'Ник личного кабинета(ID)') {
-                        lkValue = td?.textContent.trim();
+                        lkValue = td?.textContent.trim().replace(/\s*\(\d+\)\s*$/, '');
                         break;
                     }
                 }
