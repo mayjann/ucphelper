@@ -1,4 +1,5 @@
 import { showToast } from "./toast.js";
+import { BASE_BAD_WORDS } from './init.js'
 
 export function initBadWords(storage) {
     const textarea = document.getElementById("badWords");
