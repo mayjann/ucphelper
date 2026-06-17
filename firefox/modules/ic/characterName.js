@@ -33,7 +33,6 @@ export async function checkCharacterName() {
     });
 
     for (const rule of nickRules) {
-            const nick="lan_Connor";
         const res = rule.test(nick);
 
         if (!res) continue;
