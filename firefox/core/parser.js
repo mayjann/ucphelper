@@ -14,7 +14,7 @@ export async function getBanDataFromUrl(url, playerName) {
 
         if (!actionText) return;
 
-        const isGiveAction = actionText.includes("выдал ban");
+        const isGiveAction = actionText.includes("выдал ban") || actionText.includes("выдал jail") || actionText.includes("выдал warn");
 
         if (!isGiveAction) return;
 
@@ -31,6 +31,14 @@ export async function getBanDataFromUrl(url, playerName) {
         if (!duration) return;
 
         let type = "ban";
+
+        if (actionText.includes("jail")) {
+            type = "jail";
+        }
+
+        if (actionText.includes("warn")) {
+            type = "warn";
+        }
 
         if (duration === "2147483647" || duration === "2145917100") {
             type = "iban";
@@ -76,10 +84,25 @@ export async function getPunishmentData(url) {
 
             if (text.includes("забанил ЛК")) {
                 type = "accban";
+
+            } else if (
+                text.includes("выдал jail") ||
+                text.includes("посадил в jail")
+            ) {
+                type = "jail";
+
+            } else if (
+                text.includes("выдал warn") ||
+                text.includes("предупредил")
+            ) {
+                type = "warn";
+
             } else if (text.includes("забанил на 2147483647")) {
                 type = "iban";
+
             } else if (text.includes("забанил на 2145917100")) {
                 type = "iban";
+
             } else if (text.includes("забанил на")) {
                 type = "ban";
             }
