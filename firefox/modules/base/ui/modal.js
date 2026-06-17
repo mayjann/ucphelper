@@ -199,7 +199,7 @@ function showBanHistoryModal(player, history = []) {
         </div>
 
 
-        <div style="max-height:400px;overflow:auto">
+        <div class="ucp-modal-scroll">
             <table class="ucp-history-table">
                 <thead>
                     <tr>
