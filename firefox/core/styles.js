@@ -372,6 +372,12 @@ export function injectStyles() {
         .ucp-copy-lc:active {
             transform: scale(0.9);
         }
+
+        .ucp-modal-scroll {
+            max-height: 400px;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
     `;
     document.head.appendChild(style);
 }
