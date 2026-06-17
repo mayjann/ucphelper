@@ -1,4 +1,4 @@
-const AUDIT_FLAGS = {
+export const AUDIT_FLAGS = {
     ACCOUNT_GMAIL_ALIAS: {
         severity: "warning",
         desc: "Используется Gmail alias"
@@ -56,9 +56,13 @@ const AUDIT_FLAGS = {
         severity: "warning",
         desc: "В имени персонажа неправильное использование подчёркиваний"
     },
-    CHARACTER_NAME_TRASH_STRING: {
+    CHARACTER_NAME_BAD_WORDS: {
         severity: "warning",
-        desc: "Имя персонажа содержит мусорные символы"
+        desc: "Имя персонажа содержит запрещённые слова"
+    },
+    CHARACTER_NAME_RANDOM_LETTERS: {
+        severity: "warning",
+        desc: "Имя персонажа выглядит как случайный набор символов"
     },
     CHARACTER_NAME_IS_FAMOUS: {
         severity: "warning",

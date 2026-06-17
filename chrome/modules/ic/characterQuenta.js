@@ -1,4 +1,11 @@
-function processQuenta() {
+import { Utils } from "../../core/utils/index.js";
+import { UI } from "../base/ui/index.js";
+import { setAuditFlag } from "../base/audit.js";
+import { highlightMixedWords, highlightBadWords } from "../../core/highlightText.js";
+import { ALL_BAD_WORDS } from "../../core/config.js";
+
+
+export async function processQuenta() {
     const quentaBlock = document.querySelector('.quenta');
     if (!quentaBlock || quentaBlock.getAttribute('data-processed')) return;
 
@@ -10,15 +17,16 @@ function processQuenta() {
     let htmlContent = contentDiv.innerHTML;
     const textContent = contentDiv.innerText;
 
-    if (checkMixedLayout(textContent)) {
+    
+    if (Utils.checkMixedLayout(textContent)) {
         setAuditFlag("CHARACTER_QUENTA_MIXED_LAYOUT", true);
-        headerTitle.appendChild(createBadge("СМЕШАННАЯ РАСКЛАДКА", "ucp-badge-purple"));
+        headerTitle.appendChild(UI.createBadge("СМЕШАННАЯ РАСКЛАДКА", "ucp-badge-purple"));
         htmlContent = highlightMixedWords(htmlContent, textContent);
     }
 
-    if (checkInvisibleChars(textContent)) {
+    if (Utils.checkInvisibleChars(textContent)) {
         setAuditFlag("CHARACTER_QUENTA_HIDDEN_WORDS", true);
-        headerTitle.appendChild(createBadge("СКРЫТЫЕ СИМВОЛЫ", "ucp-badge-red"));
+        headerTitle.appendChild(UI.createBadge("СКРЫТЫЕ СИМВОЛЫ", "ucp-badge-red"));
     }
 
     const badWords = ALL_BAD_WORDS || [];
@@ -27,17 +35,15 @@ function processQuenta() {
     if (hasBadWords) {
         if (headerTitle) {
             setAuditFlag("CHARACTER_QUENTA_BAD_WORDS", true);
-            headerTitle.appendChild(createBadge("ЗАПРЕЩЕННЫЕ СЛОВА", "ucp-badge-red"));
+            headerTitle.appendChild(UI.createBadge("ЗАПРЕЩЕННЫЕ СЛОВА", "ucp-badge-red"));
         }   
         htmlContent = highlightBadWords(htmlContent, badWords);
     }
 
-    const quentaCheck = checkQuentaConstructed(textContent);
-
-    if (quentaCheck.isConstructed) {
+    if (Utils.checkQuentaConstructed(textContent)) {
         setAuditFlag("CHARACTER_QUENTA_CONSTRUCTOR", true);
         headerTitle.appendChild(
-            createBadge("КОНСТРУКТОР КВЕНТЫ", "ucp-badge-green")
+            UI.createBadge("КОНСТРУКТОР КВЕНТЫ", "ucp-badge-green")
         );
     }
     

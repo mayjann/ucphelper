@@ -1,4 +1,9 @@
-function checkAccountEmail() {
+import { setAuditFlag } from "../base/audit.js";
+import { UI } from "../base/ui/index.js";
+import { disposableDomains } from "../../core/config.js";
+
+
+export async function checkAccountEmail() {
     const ths = document.getElementsByTagName("th");
 
     for (let th of ths) {
@@ -14,7 +19,7 @@ function checkAccountEmail() {
 
         if (text.includes("+")) {
             setAuditFlag("ACCOUNT_GMAIL_ALIAS", true);
-            td.appendChild(createBadge("GMAIL ALIAS", "ucp-badge-red"));
+            td.appendChild(UI.createBadge("GMAIL ALIAS", "ucp-badge-red"));
             cellColor = "rgba(220, 53, 69, 0.2)";
             hasError = true;
         }
@@ -22,7 +27,7 @@ function checkAccountEmail() {
         const domain = text.split("@")[1];
         if (domain && disposableDomains.has(domain.toLowerCase())) {
             setAuditFlag("ACCOUNT_TEMP_EMAIL", true);
-            td.appendChild(createBadge("ВРЕМЕННАЯ ПОЧТА", "ucp-badge-red"));
+            td.appendChild(UI.createBadge("ВРЕМЕННАЯ ПОЧТА", "ucp-badge-red"));
             if (!hasError) {
                 cellColor = "rgba(220, 53, 69, 0.2)";
                 hasError = true;
@@ -32,7 +37,7 @@ function checkAccountEmail() {
         const parts = text.split("@");
         if (parts.length > 0 && parts[0].length > 25) {
             setAuditFlag("ACCOUNT_LONG_LOCAL_PART", true);
-            td.appendChild(createBadge("ПОДОЗРИТЕЛЬНАЯ ДЛИНА", "ucp-badge-brown"));
+            td.appendChild(UI.createBadge("ПОДОЗРИТЕЛЬНАЯ ДЛИНА", "ucp-badge-brown"));
             if (!hasError) {
                 cellColor = "rgba(121, 85, 72, 0.2)";
                 hasError = true;

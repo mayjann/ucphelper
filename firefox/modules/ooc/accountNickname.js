@@ -1,4 +1,8 @@
-function checkAccountNickname() {
+import { Utils } from "../../core/utils/index.js";
+import { UI } from "../base/ui/index.js";
+
+
+export async function checkAccountNickname() {
     const ths = document.getElementsByTagName("th");
 
     for (let th of ths) {
@@ -11,12 +15,16 @@ function checkAccountNickname() {
 
         const text = td.innerText.trim();
 
-        const reason = checkTrashString(text);
-        if (reason) {
-            td.appendChild(createBadge(reason, "ucp-badge-brown"));
+        if (Utils.checkBadWords(text).has) {
+            td.appendChild(UI.createBadge("ЗАПРЕЩЕННЫЕ СЛОВА", "ucp-badge-brown"));
             td.style.backgroundColor = "rgba(121, 85, 72, 0.2)";
+            th.setAttribute("data-nick-checked", "true");
+            continue;
         }
 
-        th.setAttribute("data-nick-checked", "true");
+        if (Utils.checkRandomLetters(text)) {
+            td.appendChild(UI.createBadge("НАБОР БУКВ", "ucp-badge-purple"));
+            td.style.backgroundColor = "rgba(111, 66, 193, 0.15)";
+        }
     }
 }

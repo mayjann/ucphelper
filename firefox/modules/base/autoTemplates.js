@@ -1,4 +1,4 @@
-async function initTemplateWatcher() {
+export async function initTemplateWatcher() {
     if (!window.location.href.includes("/ucp")) return;
 
     const select = document.querySelector('#inputState');

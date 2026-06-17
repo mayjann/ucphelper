@@ -1,4 +1,4 @@
-async function initTemplateWatcher() {
+export async function initTemplateWatcher() {
     if (!window.location.href.includes("/ucp")) return;
 
     const select = document.querySelector('#inputState');
@@ -13,7 +13,7 @@ async function initTemplateWatcher() {
         const reasonId = select.value;
         if (!reasonId) return;
 
-        const storage = await chrome.storage.sync.get([
+        const storage = await browser.storage.sync.get([
             "useTemplates",
             "templates"
         ]);

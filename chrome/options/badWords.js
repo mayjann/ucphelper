@@ -17,7 +17,7 @@ export function initBadWords(storage) {
 			w => !BASE_BAD_WORDS.includes(w)
 		);
 
-		await chrome.storage.sync.set({
+		await browser.storage.sync.set({
 			userBadWords: newUserWords
 		});
 

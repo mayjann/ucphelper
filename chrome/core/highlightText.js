@@ -1,4 +1,4 @@
-function highlightMixedWords(html, textContent) {
+export function highlightMixedWords(html, textContent) {
     const latCount = (textContent.match(/[a-zA-Z]/g) || []).length;
     const cyrCount = (textContent.match(/[а-яА-ЯёЁ]/g) || []).length;
 
@@ -34,7 +34,7 @@ function highlightMixedWords(html, textContent) {
     return tokens.join('');
 }
 
-function highlightBadWords(html, badWords) {
+export function highlightBadWords(html, badWords) {
     let tokens = html.split(/(<[^>]*>)/);
     for (let i = 0; i < tokens.length; i++) {
         if (!tokens[i].startsWith('<')) {

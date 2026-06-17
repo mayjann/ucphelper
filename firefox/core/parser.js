@@ -1,61 +1,213 @@
-async function getBanDataFromUrl(url, playerName) {
-    const res = await fetch(url, { credentials: "include" });
-    const html = await res.text();
-
-    const doc = new DOMParser().parseFromString(html, "text/html");
-
-    const rows = doc.querySelectorAll("table tbody tr");
+export async function getBanDataFromUrl(url, playerName) {
     const bans = [];
 
-    rows.forEach(row => {
-        const admin = row.children[0]?.textContent.trim();
-        const actionText = row.children[1]?.textContent.trim();
-        const date = row.children[3]?.textContent.trim();
+    let currentPage = 1;
+    let maxPage = 1;
 
-        if (!actionText) return;
 
-        const isGiveAction = actionText.includes("выдал ban");
+    async function parsePage(pageUrl, pageNumber) {
+        console.log(`[BanParser] Parsing page ${pageNumber}:`, pageUrl);
 
-        if (!isGiveAction) return;
 
-        const playerMatch = actionText.match(/игроку\s+([A-Za-z0-9_]+)/i);
-        if (!playerMatch) return;
-
-        const targetPlayer = playerMatch[1];
-
-        if (targetPlayer !== playerName) return;
-
-        const durationMatch = actionText.match(/Срок наказания:\s*([0-9]+)/i);
-        const duration = durationMatch ? durationMatch[1] : null;
-        
-        if (!duration) return;
-
-        let type = "ban";
-
-        if (duration === "2147483647" || duration === "2145917100") {
-            type = "iban";
-        }
-
-        if (actionText.includes("accban")) {
-            type = "accban";
-        }
-
-        const reasonMatch = actionText.match(/Причина:\s*(.+)$/i);
-        const reason = reasonMatch ? reasonMatch[1].trim() : null;
-
-        bans.push({
-            type,
-            admin,
-            duration,
-            reason,
-            date
+        const res = await fetch(pageUrl, {
+            credentials: "include"
         });
-    });
+
+        const html = await res.text();
+
+        const doc = new DOMParser()
+            .parseFromString(html, "text/html");
+
+
+        const pageBans = [];
+
+
+        const rows = doc.querySelectorAll("table tbody tr");
+
+
+        rows.forEach(row => {
+            const admin = row.children[0]?.textContent.trim();
+            const actionText = row.children[1]?.textContent.trim();
+            const date = row.children[3]?.textContent.trim();
+
+
+            if (!actionText) return;
+
+
+            const isGiveAction =
+                actionText.includes("выдал ban") ||
+                actionText.includes("выдал accban") ||
+                actionText.includes("выдал jail") ||
+                actionText.includes("выдал warn");
+
+
+            if (!isGiveAction) return;
+
+
+            const playerMatch = actionText.match(
+                /игроку\s+([A-Za-z0-9_]+)/i
+            );
+
+
+            if (!playerMatch) return;
+
+
+            if (playerMatch[1] !== playerName) return;
+
+
+
+            const durationMatch = actionText.match(
+                /Срок наказания:\s*([0-9]+)/i
+            );
+
+            const duration = durationMatch
+                ? durationMatch[1]
+                : null;
+
+
+            // ban/iban/accban требуют срок
+            // warn и jail могут идти без срока
+            if (
+                !duration &&
+                !actionText.includes("warn")
+            ) {
+                return;
+            }
+
+
+
+            let type = "ban";
+
+
+            if (actionText.includes("jail")) {
+                type = "jail";
+            }
+
+
+            if (actionText.includes("warn")) {
+                type = "warn";
+            }
+
+
+            if (
+                duration === "2147483647" ||
+                duration === "2145917100"
+            ) {
+                type = "iban";
+            }
+
+
+            if (actionText.includes("accban")) {
+                type = "accban";
+            }
+
+
+
+            const reasonMatch = actionText.match(
+                /Причина:\s*(.+)$/i
+            );
+
+
+            const reason = reasonMatch
+                ? reasonMatch[1].trim()
+                : null;
+
+
+
+            const punishment = {
+                type,
+                admin,
+                duration,
+                reason,
+                date
+            };
+
+
+            pageBans.push(punishment);
+            bans.push(punishment);
+        });
+
+
+
+        console.log(
+            `[BanParser] Page ${pageNumber} found punishments:`,
+            pageBans.length
+        );
+
+
+        if (pageBans.length) {
+            console.table(pageBans);
+        }
+
+
+
+        const pages = [
+            ...doc.querySelectorAll(
+                ".dataTables_paginate a.paginate_button"
+            )
+        ]
+            .map(a => Number(a.textContent.trim()))
+            .filter(Number.isInteger);
+
+
+
+        const detectedMax = Math.max(
+            ...pages,
+            1
+        );
+
+
+        if (detectedMax > maxPage) {
+            maxPage = detectedMax;
+
+            console.log(
+                `[BanParser] New max page detected: ${maxPage}`
+            );
+        }
+
+
+        console.log(
+            `[BanParser] Current pagination:`,
+            pages
+        );
+    }
+
+
+
+    while (currentPage <= maxPage) {
+
+        const pageUrl = new URL(url);
+
+
+        if (currentPage > 1) {
+            pageUrl.searchParams.set(
+                "page",
+                currentPage
+            );
+        }
+
+
+        await parsePage(
+            pageUrl.href,
+            currentPage
+        );
+
+
+        currentPage++;
+    }
+
+
+    console.log(
+        `[BanParser] Finished. Total punishments: ${bans.length}`
+    );
+
+    console.table(bans);
+
 
     return bans;
 }
 
-async function getPunishmentData(url) {
+export async function getPunishmentData(url) {
     const res = await fetch(url, { credentials: "include" });
     const html = await res.text();
 
@@ -76,10 +228,25 @@ async function getPunishmentData(url) {
 
             if (text.includes("забанил ЛК")) {
                 type = "accban";
+
+            } else if (
+                text.includes("выдал jail") ||
+                text.includes("посадил в jail")
+            ) {
+                type = "jail";
+
+            } else if (
+                text.includes("выдал warn") ||
+                text.includes("предупредил")
+            ) {
+                type = "warn";
+
             } else if (text.includes("забанил на 2147483647")) {
                 type = "iban";
+
             } else if (text.includes("забанил на 2145917100")) {
                 type = "iban";
+
             } else if (text.includes("забанил на")) {
                 type = "ban";
             }
