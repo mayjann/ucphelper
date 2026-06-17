@@ -360,6 +360,18 @@ export function injectStyles() {
             background: #2196f3;
             color: #fff;
         }
+
+        .ucp-copy-lc {
+            cursor: pointer;
+            color: #4dabf7;
+            text-decoration: underline;
+            display: inline-block;
+            transition: transform 0.1s ease;
+        }
+
+        .ucp-copy-lc:active {
+            transform: scale(0.9);
+        }
     `;
     document.head.appendChild(style);
 }
