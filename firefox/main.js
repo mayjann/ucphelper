@@ -6,10 +6,17 @@ import { initApp } from "./core/init.js";
 async function checkers() {
     if (!/^\/ucp\/\d+$/.test(location.pathname)) return;
 
-    await Modules.runBase();
-    await Modules.runOOC();
-    await Modules.runIC();
-    UI.renderAuditWidget();
+    UI.showLoader();
+
+    try {
+        await Modules.runBase();
+        await Modules.runOOC();
+        await Modules.runIC();
+
+        UI.renderAuditWidget();
+    } finally {
+        UI.hideLoader();
+    }
 }
 
 async function bootstrap() { const ok = await initApp();
