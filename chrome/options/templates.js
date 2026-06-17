@@ -1,4 +1,5 @@
 import { showToast } from "./toast.js";
+import { DEFAULT_SETTINGS } from "./init.js"
 
 export function initTemplates(storage) {
     const toggle = document.getElementById("useTemplates");
