@@ -1,10 +1,9 @@
-const UCP_URL = "https://admin.gambit-rp.com/ucp";
+const REPO = "mayjann/ucphelper";
 
 let creatingOffscreen;
 
 async function setupOffscreenDocument() {
-  const exists = await chrome.offscreen.hasDocument?.();
-
+  const exists = await browser.offscreen.hasDocument?.();
   if (exists) return;
 
   if (creatingOffscreen) {
@@ -12,7 +11,7 @@ async function setupOffscreenDocument() {
     return;
   }
 
-  creatingOffscreen = chrome.offscreen.createDocument({
+  creatingOffscreen = browser.offscreen.createDocument({
     url: "offscreen.html",
     reasons: ["AUDIO_PLAYBACK"],
     justification: "Play notification sound"
@@ -22,133 +21,212 @@ async function setupOffscreenDocument() {
   creatingOffscreen = null;
 }
 
-async function updateTimer() {
-  const {autoUpdateUcp = false, autoUpdateUcpTimeout = 300} = await chrome.storage.sync.get([ "autoUpdateUcp", "autoUpdateUcpTimeout" ]);
+function compareVersions(v1, v2) {
+  const a = v1.replace("v", "").split(".").map(Number);
+  const b = v2.replace("v", "").split(".").map(Number);
 
-  await chrome.alarms.clear("ucpCheck");
+  const len = Math.max(a.length, b.length);
 
-  if (autoUpdateUcp) {
-    chrome.alarms.create("ucpCheck", {
-      periodInMinutes: autoUpdateUcpTimeout / 60
-    });
+  for (let i = 0; i < len; i++) {
+    const numA = a[i] || 0;
+    const numB = b[i] || 0;
+
+    if (numA > numB) return 1;
+    if (numA < numB) return -1;
   }
+
+  return 0;
+}
+
+const UCP_URL = "https://admin.gambit-rp.com/ucp";
+
+let autoUpdateUcpInterval = null;
+
+async function updateTimer() {
+  const storage = await browser.storage.sync.get([ "autoUpdateUcp", "autoUpdateUcpTimeout", ]);
+	const autoUpdateUcp = storage.autoUpdateUcp ?? false;
+	const autoUpdateUcpTimeout = storage.autoUpdateUcpTimeout ?? 300;
+
+    if (autoUpdateUcpInterval) {
+        clearInterval(autoUpdateUcpInterval);
+        autoUpdateUcpInterval = null;
+    }
+
+    if (autoUpdateUcp) {
+        autoUpdateUcpInterval = setInterval(() => {
+            checkUcp();
+        }, autoUpdateUcpTimeout * 1000);
+    }
 }
 
 async function checkUcp() {
-  const storage = await chrome.storage.sync.get([ "autoUpdateUcpTab", "quietHoursEnabled", "quietHours", "quietEnabled" ]);
-  const autoUpdateUcpTab = storage.autoUpdateUcpTab ?? true;
-  const quietHoursEnabled = storage.quietHoursEnabled ?? false;
-  const quietEnabled = storage.quietEnabled ?? false;
-  const quietHours = storage.quietHours ?? { from: "23:00", to: "05:00" };
+	const storage = await browser.storage.sync.get([ "autoUpdateUcpTab", "quietHoursEnabled", "quietHours", "quietEnabled" ]);
 
-  let inQuietHours = false;
+	const autoUpdateUcpTab = storage.autoUpdateUcpTab ?? true;
+	const quietHoursEnabled = storage.quietHoursEnabled ?? false;
+	const quietHours = storage.quietHours ?? { from: "23:00", to: "05:00" };
+	const { from, to } = quietHours;
+	const quietEnabled = storage.quietEnabled ?? false;
 
-  if (quietHoursEnabled) {
-    const now = new Date();
+	let inQuietHours = false
+		
+	if (quietHoursEnabled) {
+		const now = new Date();
+		const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+		
+		const toMinutes = timeStr => {
+			const [h, m] = timeStr.split(":").map(Number);
+			return h * 60 + m;
+		};
 
-    const toMinutes = (t) => {
-      const [h, m] = t.split(":").map(Number);
-      return h * 60 + m;
-    };
+		const fromMinutes = toMinutes(quietHours.from);
+		const toMinutesVal = toMinutes(quietHours.to);
+		const nowMinutes = toMinutes(currentTime);
+		
+		if (fromMinutes <= toMinutesVal) {
+			inQuietHours = nowMinutes >= fromMinutes && nowMinutes <= toMinutesVal;
+		} else {
+			inQuietHours = nowMinutes >= fromMinutes || nowMinutes <= toMinutesVal;
+		}
+	}
 
-    const nowMin = now.getHours() * 60 + now.getMinutes();
-    const fromMin = toMinutes(quietHours.from);
-    const toMin = toMinutes(quietHours.to);
+	const response = await fetch(UCP_URL, { credentials: "include" });
 
-    if (fromMin <= toMin) {
-      inQuietHours = nowMin >= fromMin && nowMin <= toMin;
-    } else {
-      inQuietHours = nowMin >= fromMin || nowMin <= toMin;
-    }
-  }
+	if (!response.ok) return console.warn("[UCP] Ошибка запроса, пропуск проверки");
 
-  const response = await fetch(UCP_URL, { credentials: "include" });
+	const html = await response.text();
+	const parser = new DOMParser();
+	const doc = parser.parseFromString(html, "text/html");
 
-  if (!response.ok) {
-    return;
-  }
+	const menuItems = [...doc.querySelectorAll("a.dropdown-toggle")];
+	const charactersItem = menuItems.find(a => a.textContent.includes("Персонажи"));
 
-  const html = await response.text();
+	if (!charactersItem) return console.warn("[UCP] Пункт 'Персонажи' не найден");
 
-  const match = html.match(/Персонажи[\s\S]*?font-size:\s*10px[^>]*>(\d+)</i);
+	const counterSpan = charactersItem.querySelector('span[style*="font-size: 10px"]');
+	if (!counterSpan) return console.warn("[UCP] Счетчик в пункте 'Персонажи' не найден");
 
-  if (!match) {
-    return;
-  }
+	const value = parseInt(counterSpan.textContent.trim(), 10);
 
-  const value = parseInt(match[1], 10);
-
-  if (!value) {
-    return;
-  }
-
-  if (autoUpdateUcpTab) {
-    const tabs = await chrome.tabs.query({
-      url: [
-        "https://admin.gambit-rp.com/ucp",
-        "https://admin.gambit-rp.com/ucp/"
-      ]
-    });
-
-    for (const tab of tabs) {
-      chrome.tabs.reload(tab.id);
-    }
-  }
-
-
-  // ===== УВЕДОМЛЕНИЕ =====
-
-  if (!inQuietHours && !quietEnabled) {
-    sendNotification(`Непроверенных UCP: ${value}`);
-  }
+	if (!value || value === 0) return
+	
+	if (autoUpdateUcpTab) {
+		const tabs = await browser.tabs.query({ url: ["https://admin.gambit-rp.com/ucp", "https://admin.gambit-rp.com/ucp/"] });
+		if (tabs.length > 0) {
+			for (const tab of tabs) { browser.tabs.reload(tab.id); }
+		}
+	}
+	
+	if (!inQuietHours && !quietEnabled) {
+		sendNotification(`Непроверенных UCP: ${value}`);
+	}
 }
 
 async function sendNotification(text) {
+    const {
+		autoUpdateOnlySound = false,
+		autoUpdateNotifySound = "sound1.mp3",
+		AutoUpdateNotifySoundVolume = 75
+	} = await browser.storage.sync.get(["autoUpdateOnlySound", "autoUpdateNotifySound", "AutoUpdateNotifySoundVolume"]);
 
-  const {
-    autoUpdateOnlySound = false,
-    autoUpdateNotifySound = "sound1.mp3",
-    AutoUpdateNotifySoundVolume = 75
-  } = await chrome.storage.sync.get([
-    "autoUpdateOnlySound",
-    "autoUpdateNotifySound",
-    "AutoUpdateNotifySoundVolume"
-  ]);
-
-  if (autoUpdateOnlySound) {
-    await setupOffscreenDocument();
-
-    chrome.runtime.sendMessage({
-      type: "PLAY_SOUND",
-      url: chrome.runtime.getURL(`media/sounds/${autoUpdateNotifySound}`),
-      volume: AutoUpdateNotifySoundVolume / 100
-    });
-
-    return;
-  }
-
-  chrome.notifications.create({
-    type: "basic",
-    iconUrl: chrome.runtime.getURL("icons/128.png"),
-    title: "UCP Helper",
-    message: text
-  });
+    if (autoUpdateOnlySound) {
+        const audio = new Audio(browser.runtime.getURL(`media/sounds/${autoUpdateNotifySound}`));
+		audio.volume = AutoUpdateNotifySoundVolume / 100;
+        audio.play().catch(() => console.warn("[UCP] Не удалось воспроизвести звук"));
+    } else {
+        browser.notifications.create({
+            type: "basic",
+            iconUrl: "icons/logo.png",
+            title: "UCP Helper",
+            message: text
+        });
+    }
 }
 
-chrome.runtime.onInstalled.addListener(() => {
-  updateTimer();
+browser.runtime.onInstalled.addListener(() => {
+    updateTimer();
 });
 
-chrome.runtime.onStartup.addListener(() => {
-  updateTimer();
+browser.runtime.onStartup.addListener(() => {
+    updateTimer();
 });
 
-chrome.storage.onChanged.addListener(() => {
-  updateTimer();
+browser.storage.onChanged.addListener((changes, area) => {
+    updateTimer();
 });
 
-chrome.alarms.onAlarm.addListener((alarm) => {
-  if (alarm.name === "ucpCheck") {
-    checkUcp();
+browser.alarms.onAlarm.addListener((alarm) => {
+	if (alarm.name === "versionCheck") {
+		checkExtensionUpdate();
+	}
+	if (alarm.name === "ucpCheck") {
+		checkUcp();
+	}
+});
+
+
+browser.tabs.onUpdated.addListener(async (tabId, info, tab) => {
+  if (!tab.url?.startsWith(UCP_URL)) return;
+  if (info.status !== "complete") return;
+
+  try {
+    const res = await fetch(
+      `https://api.github.com/repos/${REPO}/releases/latest`
+    );
+
+    if (!res.ok) return;
+
+    const data = await res.json();
+
+    const latestVersion = data.tag_name;
+    const currentVersion = chrome.runtime.getManifest().version;
+
+    const isNew = compareVersions(latestVersion, currentVersion) > 0;
+
+    if (!isNew) return;
+
+    browser.scripting.executeScript({
+      target: { tabId },
+      func: (version) => {
+        if (document.getElementById("ucp-update-modal")) return;
+
+        const overlay = document.createElement("div");
+        overlay.id = "ucp-update-modal";
+        overlay.className = "ucp-modal-overlay";
+
+        overlay.innerHTML = `
+          <div class="ucp-modal-content">
+            <div class="ucp-modal-title">UCP Helper</div>
+            <div class="ucp-modal-subtitle">Доступно обновление</div>
+
+            <div class="ucp-modal-text">
+              Доступна новая версия расширения <b>${version}</b><br><br>
+
+              <a 
+                href="https://github.com/mayjann/ucphelper/releases/latest"
+                target="_blank"
+                style="color:#4dabf7;text-decoration:underline"
+              >
+                Перейти на страницу релиза
+              </a>
+            </div>
+
+            <button class="ucp-modal-btn" id="ucpUpdateCloseBtn">
+              Закрыть
+            </button>
+          </div>
+        `;
+
+        document.body.appendChild(overlay);
+
+        document.getElementById("ucpUpdateCloseBtn").onclick = () => {
+          overlay.remove();
+        };
+      },
+      args: [latestVersion]
+    });
+
+  } catch (err) {
+    console.error("[UCP] update check error:", err);
   }
 });

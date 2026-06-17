@@ -1,6 +1,10 @@
+import { setAuditFlag } from "../base/audit.js";
+import { UI } from "../base/ui/index.js";
+
+
 let firstPlayerProcessed = false;
 
-async function getFirstPlayerRegDate() {
+export async function getFirstPlayerRegDate() {
     if (firstPlayerProcessed) return;
     firstPlayerProcessed = true;
 
@@ -79,7 +83,7 @@ async function getFirstPlayerRegDate() {
                     const td = row.querySelector('td');
 
                     if (th?.textContent.trim() === 'Ник личного кабинета(ID)') {
-                        lkValue = td?.textContent.trim();
+                        lkValue = td?.textContent.trim().replace(/\s*\(\d+\)\s*$/, '');
                         break;
                     }
                 }
@@ -100,7 +104,7 @@ async function getFirstPlayerRegDate() {
                 !td.querySelector('.ucp-request-btn')
             ) {
                 td.appendChild(
-                    createNewRequestButton(
+                    UI.createNewRequestButton(
                         window.location.href,
                         lkValue,
                         regDate,

@@ -1,4 +1,7 @@
-function checkAccountIPBan() {
+import { setAuditFlag } from "../base/audit.js";
+import { UI } from "../base/ui/index.js";
+
+export async function checkAccountIPBan() {
     const bTags = document.getElementsByTagName("b");
 
     for (let b of bTags) {
@@ -14,7 +17,7 @@ function checkAccountIPBan() {
 
         const newText = `IP "${ip}" Заблокирован администратором ${admin}. Причина: ${reason}`;
 
-        showBanPopup(newText);
+        UI.showBanPopup(newText);
 
         if (!b.getAttribute("data-processed")) {
             b.innerText = newText;

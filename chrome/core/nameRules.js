@@ -1,51 +1,59 @@
-const nickRules = [
+import { Utils } from "./utils/index.js";
+
+
+export const nickRules = [
     {
         flag: "CHARACTER_NAME_RU",
-        test: nick => /[а-яА-ЯёЁ]/.test(nick),
-        badge: ["РУССКИЕ БУКВЫ", "ucp-badge-red"]
+        test: Utils.isRussian,
+        badge: ["РУССКИЕ БУКВЫ", "ucp-badge-red"],
+        cellColor: "rgba(220, 53, 69, 0.2)",
     },
     {
         flag: "CHARACTER_NAME_MIXED_LAYOUT",
-        test: checkMixedLayout,
-        badge: ["СМЕШАННАЯ РАСКЛАДКА (FAKE)", "ucp-badge-red"]
+        test: Utils.checkMixedLayout,
+        badge: ["СМЕШАННАЯ РАСКЛАДКА", "ucp-badge-red"],
+        cellColor: "rgba(220, 53, 69, 0.2)",
     },
     {
         flag: "CHARACTER_NAME_L_I_SUSPICION",
-        test: nick => /[a-z]I/.test(nick) || /^l/.test(nick) || (nick.includes('l') && nick.includes('I')),
-        badge: ["l/I ПОДОЗРЕНИЕ", "ucp-badge-orange"]
+        test: Utils.isLIObfuscation,
+        badge: ["l/I ПОДОЗРЕНИЕ", "ucp-badge-orange"],
+        cellColor: "rgba(253, 126, 20, 0.2)",
     },
     {
         flag: "CHARACTER_NAME_HAS_DIGITS",
-        test: nick => /\d/.test(nick),
-        badge: ["ЦИФРЫ В НИКЕ", "ucp-badge-red"]
+        test: Utils.hasDigits,
+        badge: ["ЦИФРЫ В НИКЕ", "ucp-badge-red"],
+        cellColor: "rgba(220, 53, 69, 0.2)",
     },
     {
         flag: "CHARACTER_NAME_ROMAN_NUMBERS",
-        test: nick => /_([IVXLCDM]+)$/.test(nick),
-        badge: ["РИМСКИЕ ЦИФРЫ", "ucp-badge-purple"]
+        test: Utils.hasRomanNumbers,
+        badge: ["РИМСКИЕ ЦИФРЫ", "ucp-badge-purple"],
+        cellColor: "rgba(111, 66, 193, 0.15)",
     },
     {
         flag: "CHARACTER_NAME_BAD_CASE",
-        test: nick => {
-            const regDouble = /^[A-Z][a-zA-Z]+_[A-Z][a-zA-Z]+$/;
-            const regTriple = /^[A-Z][a-zA-Z]+_[A-Z][a-zA-Z]+_[A-Z][a-zA-Z]+$/;
-            return !(regDouble.test(nick) || regTriple.test(nick));
-        },
-        badge: ["КРИВОЙ РЕГИСТР", "ucp-badge-purple"]
+        test: Utils.isBadCase,
+        badge: ["КРИВОЙ РЕГИСТР", "ucp-badge-purple"],
+        cellColor: "rgba(111, 66, 193, 0.15)",
     },
     {
         flag: "CHARACTER_NAME_BAD_UNDERSCORE",
-        test: nick => {
-            const underscores = (nick.match(/_/g) || []).length;
-            const regTriple = /^[A-Z][a-zA-Z]+_[A-Z][a-zA-Z]+_[A-Z][a-zA-Z]+$/;
-            return underscores === 0 || (underscores > 1 && !regTriple.test(nick));
-        },
-        badge: ["ФОРМАТ (_)", "ucp-badge-purple"]
+        test: Utils.badUnderscore,
+        badge: ["ФОРМАТ (_)", "ucp-badge-purple"],
+        cellColor: "rgba(111, 66, 193, 0.15)",
     },
     {
-        flag: "CHARACTER_NAME_TRASH_STRING",
-        test: checkTrashString,
-        badge: result => [result, "ucp-badge-brown"],
-        dynamic: true
+        flag: "CHARACTER_NAME_BAD_WORDS",
+        test: nick => Utils.checkBadWords(nick).has,
+        badge: ["ЗАПРЕЩЕННЫЕ СЛОВА", "ucp-badge-red"],
+        cellColor: "rgba(220, 53, 69, 0.2)",
+    },
+    {
+        flag: "CHARACTER_NAME_RANDOM_LETTERS",
+        test: Utils.checkRandomLetters,
+        badge: ["НАБОР БУКВ", "ucp-badge-purple"],
+        cellColor: "rgba(111, 66, 193, 0.15)",
     }
 ];

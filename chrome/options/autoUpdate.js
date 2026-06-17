@@ -169,13 +169,13 @@ export function initAutoUpdate(storage) {
 
     playSoundBtn.addEventListener("click", () => {
         const file = soundSelect.value || NOTIFY_SOUNDS[0].file;
-        const audio = new Audio(chrome.runtime.getURL(`media/sounds/${file}`));
+        const audio = new Audio(browser.runtime.getURL(`media/sounds/${file}`));
         if (volumeSlider) audio.volume = volumeSlider.value / 100;
         audio.play().catch(() => showToast("Не удалось воспроизвести звук", "error"));
     });
 
     document.getElementById("saveGeneralBtn").addEventListener("click", async () => {
-        await chrome.storage.sync.set({
+        await browser.storage.sync.set({
             autoUpdateUcp: autoUpdateUcpToggle.checked,
 			autoUpdateUcpTab: autoUpdateUcpTabToggle.checked,
 			autoUpdateOnlySound: onlySoundToggle.checked,

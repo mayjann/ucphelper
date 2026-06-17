@@ -1,9 +1,12 @@
+import { AUDIT_FLAGS } from "../../core/auditFlags.js";
+import { UI } from "./ui/index.js";
+
 
 const auditResult = Object.fromEntries(
     Object.keys(AUDIT_FLAGS).map(k => [k, false])
 );
 
-const SEVERITY = {
+export const SEVERITY = {
     critical: new Set(Object.entries(AUDIT_FLAGS)
         .filter(([, v]) => v.severity === "critical")
         .map(([k]) => k)),
@@ -13,27 +16,27 @@ const SEVERITY = {
         .map(([k]) => k))
 };
 
-const DESCRIPTIONS = Object.fromEntries(
+export const DESCRIPTIONS = Object.fromEntries(
     Object.entries(AUDIT_FLAGS).map(([k, v]) => [k, v.desc])
 );
 
-const SPECIAL = Object.fromEntries(
+export const SPECIAL = Object.fromEntries(
     Object.entries(AUDIT_FLAGS)
         .filter(([, v]) => v.severity === "special")
         .map(([k, v]) => [k, { text: v.desc, color: v.color }])
 );
 
-function setAuditFlag(key, value = true) {
+export function setAuditFlag(key, value = true) {
     if (!(key in auditResult)) return;
     auditResult[key] = value;
-    refreshAuditWidget();
+    UI.refreshAuditWidget();
 }
 
-function getAuditEntries() {
+export function getAuditEntries() {
     return Object.entries(auditResult).filter(([, v]) => v);
 }
 
-function getAuditSeverity(entries) {
+export function getAuditSeverity(entries) {
     let critical = 0;
     let warning = 0;
 
