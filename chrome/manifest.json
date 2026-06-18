@@ -2,7 +2,7 @@
 	"manifest_version": 3,
 	"name": "UCP Helper",
 	"description": "Упростит проверку UCP заявок! Powered by h1ghway & mayjann & Enotixa Inc.",
-	"version": "2.8.3",
+	"version": "2.8.4",
 
 	"browser_specific_settings": {
 		"gecko": {

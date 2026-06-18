@@ -1,3 +1,5 @@
+import { DEFAULT_SETTINGS } from "../../../core/config.js"
+
 let tooltipElem = null;
 
 export function createBadge(text, colorClass, link = null) {
