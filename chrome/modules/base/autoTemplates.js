@@ -15,7 +15,7 @@ export async function initTemplateWatcher() {
         const reasonId = select.value;
         if (!reasonId) return;
 
-        const storage = await browser.storage.sync.get([
+        const storage = await chrome.storage.sync.get([
             "useTemplates",
             "templates"
         ]);

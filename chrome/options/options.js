@@ -6,7 +6,7 @@ import { initAutoUpdate } from "./autoUpdate.js";
 const mainContainer = document.querySelector("main.container");
 
 async function loadSection(file) {
-    const storage = await browser.storage.sync.get(null);
+    const storage = await chrome.storage.sync.get(null);
     const res = await fetch(file);
     const html = await res.text();
 
@@ -44,7 +44,7 @@ async function loadSection(file) {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-    const storage = await browser.storage.sync.get(null);
+    const storage = await chrome.storage.sync.get(null);
     await initDefaults(storage);
     loadSection("options/html/notify-settings.html");
 });
