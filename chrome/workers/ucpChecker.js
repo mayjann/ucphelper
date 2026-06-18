@@ -3,7 +3,7 @@ const REPO = "mayjann/ucphelper";
 let creatingOffscreen;
 
 async function setupOffscreenDocument() {
-  const exists = await browser.offscreen.hasDocument?.();
+  const exists = await chrome.offscreen.hasDocument?.();
   if (exists) return;
 
   if (creatingOffscreen) {
@@ -11,7 +11,7 @@ async function setupOffscreenDocument() {
     return;
   }
 
-  creatingOffscreen = browser.offscreen.createDocument({
+  creatingOffscreen = chrome.offscreen.createDocument({
     url: "offscreen.html",
     reasons: ["AUDIO_PLAYBACK"],
     justification: "Play notification sound"
@@ -43,7 +43,7 @@ const UCP_URL = "https://admin.gambit-rp.com/ucp";
 let autoUpdateUcpInterval = null;
 
 async function updateTimer() {
-  const storage = await browser.storage.sync.get([ "autoUpdateUcp", "autoUpdateUcpTimeout", ]);
+  const storage = await chrome.storage.sync.get([ "autoUpdateUcp", "autoUpdateUcpTimeout", ]);
 	const autoUpdateUcp = storage.autoUpdateUcp ?? false;
 	const autoUpdateUcpTimeout = storage.autoUpdateUcpTimeout ?? 300;
 
@@ -60,7 +60,7 @@ async function updateTimer() {
 }
 
 async function checkUcp() {
-	const storage = await browser.storage.sync.get([ "autoUpdateUcpTab", "quietHoursEnabled", "quietHours", "quietEnabled" ]);
+	const storage = await chrome.storage.sync.get([ "autoUpdateUcpTab", "quietHoursEnabled", "quietHours", "quietEnabled" ]);
 
 	const autoUpdateUcpTab = storage.autoUpdateUcpTab ?? true;
 	const quietHoursEnabled = storage.quietHoursEnabled ?? false;
@@ -111,9 +111,9 @@ async function checkUcp() {
 	if (!value || value === 0) return
 	
 	if (autoUpdateUcpTab) {
-		const tabs = await browser.tabs.query({ url: ["https://admin.gambit-rp.com/ucp", "https://admin.gambit-rp.com/ucp/"] });
+		const tabs = await chrome.tabs.query({ url: ["https://admin.gambit-rp.com/ucp", "https://admin.gambit-rp.com/ucp/"] });
 		if (tabs.length > 0) {
-			for (const tab of tabs) { browser.tabs.reload(tab.id); }
+			for (const tab of tabs) { chrome.tabs.reload(tab.id); }
 		}
 	}
 	
@@ -127,14 +127,14 @@ async function sendNotification(text) {
 		autoUpdateOnlySound = false,
 		autoUpdateNotifySound = "sound1.mp3",
 		AutoUpdateNotifySoundVolume = 75
-	} = await browser.storage.sync.get(["autoUpdateOnlySound", "autoUpdateNotifySound", "AutoUpdateNotifySoundVolume"]);
+	} = await chrome.storage.sync.get(["autoUpdateOnlySound", "autoUpdateNotifySound", "AutoUpdateNotifySoundVolume"]);
 
     if (autoUpdateOnlySound) {
-        const audio = new Audio(browser.runtime.getURL(`media/sounds/${autoUpdateNotifySound}`));
+        const audio = new Audio(chrome.runtime.getURL(`media/sounds/${autoUpdateNotifySound}`));
 		audio.volume = AutoUpdateNotifySoundVolume / 100;
         audio.play().catch(() => console.warn("[UCP] Не удалось воспроизвести звук"));
     } else {
-        browser.notifications.create({
+        chrome.notifications.create({
             type: "basic",
             iconUrl: "icons/logo.png",
             title: "UCP Helper",
@@ -143,19 +143,19 @@ async function sendNotification(text) {
     }
 }
 
-browser.runtime.onInstalled.addListener(() => {
+chrome.runtime.onInstalled.addListener(() => {
     updateTimer();
 });
 
-browser.runtime.onStartup.addListener(() => {
+chrome.runtime.onStartup.addListener(() => {
     updateTimer();
 });
 
-browser.storage.onChanged.addListener((changes, area) => {
+chrome.storage.onChanged.addListener((changes, area) => {
     updateTimer();
 });
 
-browser.alarms.onAlarm.addListener((alarm) => {
+chrome.alarms.onAlarm.addListener((alarm) => {
 	if (alarm.name === "versionCheck") {
 		checkExtensionUpdate();
 	}
@@ -165,7 +165,7 @@ browser.alarms.onAlarm.addListener((alarm) => {
 });
 
 
-browser.tabs.onUpdated.addListener(async (tabId, info, tab) => {
+chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
   if (!tab.url?.startsWith(UCP_URL)) return;
   if (info.status !== "complete") return;
 
@@ -185,7 +185,7 @@ browser.tabs.onUpdated.addListener(async (tabId, info, tab) => {
 
     if (!isNew) return;
 
-    browser.scripting.executeScript({
+    chrome.scripting.executeScript({
       target: { tabId },
       func: (version) => {
         if (document.getElementById("ucp-update-modal")) return;
