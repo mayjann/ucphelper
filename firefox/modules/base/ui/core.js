@@ -36,6 +36,7 @@ export function showBanPopup(reasonText) {
 
 export function createNewRequestButton(ucpLink, lk, regDate, isNew, displayDate) {
     const btn = document.createElement('button');
+
     btn.className = "ucp-request-btn";
     btn.innerText = displayDate;
     btn.style.marginLeft = "12px";
@@ -58,12 +59,9 @@ export function createNewRequestButton(ucpLink, lk, regDate, isNew, displayDate)
     if (isNew) {
         btn.onclick = async () => {
             try {
-                await navigator.clipboard.writeText(
-`Ссылка на UCP: ${ucpLink}
-ЛК: ${lk}
-
-Новорег, прошу проверить на 26пп`
-                );
+                const storage = await chrome.storage.sync.get(["ppTemplate"]);
+                const tpl = storage.ppTemplate ?? DEFAULT_SETTINGS.ppTemplate;
+                await navigator.clipboard.writeText(renderPpTemplate(tpl, ucpLink, lk));
 
                 const popup = document.createElement('div');
                 popup.className = "ucp-copy-popup";
@@ -80,6 +78,7 @@ export function createNewRequestButton(ucpLink, lk, regDate, isNew, displayDate)
                 }, 1500);
             } catch (err) {
                 alert("Не удалось скопировать текст!");
+                console.log(err)
             }
         };
     }
@@ -111,4 +110,10 @@ export function createGoogleLink(name) {
     a.innerText = "G";
     a.title = "Google Check";
     return a;
+}
+
+function renderPpTemplate(template, ucpLink, lk) {
+	return template
+		.replaceAll("{{ucpLink}}", ucpLink || "")
+		.replaceAll("{{lk}}", lk || "");
 }

@@ -33,6 +33,7 @@ export const NOTIFY_SOUNDS = [
 
 export const DEFAULT_SETTINGS = {
     useTemplates: true,
+    autoUpdateUcpTab: true,
     autoUpdateUcp: false,
     autoUpdateUcpTab: true,
     autoUpdateUcpTimeout: 300,
@@ -50,5 +51,10 @@ export const DEFAULT_SETTINGS = {
         18: 'Никнейм нарушает правила сервера или в нем допущена ошибка. Проверьте никнейм',
         19: 'Одобрение через форумную жалобу на мое имя: https://forum.gambit-rp.com/forums/64',
         20: 'Квента соответствует нестандартному персонажу, который требует одобрения на форуме'
-    }
+    },
+    customTemplates: {},
+    ppTemplate: `Ссылка на UCP: {{ucpLink}}
+ЛК: {{lk}}
+
+Новорег, прошу проверить на 26пп`
 };
