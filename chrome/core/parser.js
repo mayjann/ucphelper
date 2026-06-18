@@ -6,33 +6,23 @@ export async function getBanDataFromUrl(url, playerName) {
 
 
     async function parsePage(pageUrl, pageNumber) {
-        console.log(`[BanParser] Parsing page ${pageNumber}:`, pageUrl);
-
-
-        const res = await fetch(pageUrl, {
-            credentials: "include"
-        });
+        const res = await fetch(pageUrl, {credentials: "include"});
 
         const html = await res.text();
 
         const doc = new DOMParser()
             .parseFromString(html, "text/html");
 
-
         const pageBans = [];
 
-
         const rows = doc.querySelectorAll("table tbody tr");
-
 
         rows.forEach(row => {
             const admin = row.children[0]?.textContent.trim();
             const actionText = row.children[1]?.textContent.trim();
             const date = row.children[3]?.textContent.trim();
 
-
             if (!actionText) return;
-
 
             const isGiveAction =
                 actionText.includes("выдал ban") ||
@@ -40,79 +30,45 @@ export async function getBanDataFromUrl(url, playerName) {
                 actionText.includes("выдал jail") ||
                 actionText.includes("выдал warn");
 
-
             if (!isGiveAction) return;
-
 
             const playerMatch = actionText.match(
                 /игроку\s+([A-Za-z0-9_]+)/i
             );
 
-
             if (!playerMatch) return;
-
 
             if (playerMatch[1] !== playerName) return;
 
+            const durationMatch = actionText.match(/Срок наказания:\s*([0-9]+)/i);
 
+            const duration = durationMatch ? durationMatch[1] : null;
 
-            const durationMatch = actionText.match(
-                /Срок наказания:\s*([0-9]+)/i
-            );
-
-            const duration = durationMatch
-                ? durationMatch[1]
-                : null;
-
-
-            // ban/iban/accban требуют срок
-            // warn и jail могут идти без срока
-            if (
-                !duration &&
-                !actionText.includes("warn")
-            ) {
+            if (!duration && !actionText.includes("warn")) {
                 return;
             }
 
-
-
             let type = "ban";
-
 
             if (actionText.includes("jail")) {
                 type = "jail";
             }
 
-
             if (actionText.includes("warn")) {
                 type = "warn";
             }
 
-
-            if (
-                duration === "2147483647" ||
-                duration === "2145917100"
-            ) {
+            if (duration === "2147483647" || duration === "2145917100") {
                 type = "iban";
             }
-
 
             if (actionText.includes("accban")) {
                 type = "accban";
             }
 
+            const reasonMatch = actionText.match(/Причина:\s*(.+)$/i);
 
-
-            const reasonMatch = actionText.match(
-                /Причина:\s*(.+)$/i
-            );
-
-
-            const reason = reasonMatch
-                ? reasonMatch[1].trim()
-                : null;
-
-
+            const reason = reasonMatch ? reasonMatch[1].trim() : null;
 
             const punishment = {
                 type,
@@ -122,24 +78,9 @@ export async function getBanDataFromUrl(url, playerName) {
                 date
             };
 
-
             pageBans.push(punishment);
             bans.push(punishment);
         });
-
-
-
-        console.log(
-            `[BanParser] Page ${pageNumber} found punishments:`,
-            pageBans.length
-        );
-
-
-        if (pageBans.length) {
-            console.table(pageBans);
-        }
-
-
 
         const pages = [
             ...doc.querySelectorAll(
@@ -149,35 +90,20 @@ export async function getBanDataFromUrl(url, playerName) {
             .map(a => Number(a.textContent.trim()))
             .filter(Number.isInteger);
 
-
-
         const detectedMax = Math.max(
             ...pages,
             1
         );
 
-
         if (detectedMax > maxPage) {
             maxPage = detectedMax;
-
-            console.log(
-                `[BanParser] New max page detected: ${maxPage}`
-            );
         }
-
-
-        console.log(
-            `[BanParser] Current pagination:`,
-            pages
-        );
     }
 
 
 
     while (currentPage <= maxPage) {
-
         const pageUrl = new URL(url);
-
 
         if (currentPage > 1) {
             pageUrl.searchParams.set(
@@ -186,23 +112,13 @@ export async function getBanDataFromUrl(url, playerName) {
             );
         }
 
-
         await parsePage(
             pageUrl.href,
             currentPage
         );
 
-
         currentPage++;
     }
-
-
-    console.log(
-        `[BanParser] Finished. Total punishments: ${bans.length}`
-    );
-
-    console.table(bans);
-
 
     return bans;
 }

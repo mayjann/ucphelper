@@ -1,3 +1,5 @@
+import { DEFAULT_SETTINGS } from "../../core/config.js";
+
 export async function initTemplateWatcher() {
     if (!window.location.href.includes("/ucp")) return;
 
