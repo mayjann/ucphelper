@@ -28,7 +28,7 @@ export function initAutoUpdate(storage) {
 	autoUpdateUcpTabToggle.checked = storage.autoUpdateUcpTab ?? DEFAULT_SETTINGS.autoUpdateUcpTab;
 	onlySoundToggle.checked = storage.autoUpdateOnlySound ?? DEFAULT_SETTINGS.autoUpdateOnlySound;
     const timeout = storage.autoUpdateUcpTimeout ?? DEFAULT_SETTINGS.autoUpdateUcpTimeout;
-    updateIntervalSelect.value = String(timeout / 60);
+    updateIntervalSelect.value = String(timeout);
 	
     soundSelect.value = storage.autoUpdateNotifySound ?? DEFAULT_SETTINGS.AutoUpdateNotifySound;
 	const savedVolume = storage.AutoUpdateNotifySoundVolume ?? DEFAULT_SETTINGS.AutoUpdateNotifySoundVolume;
@@ -179,7 +179,7 @@ export function initAutoUpdate(storage) {
             autoUpdateUcp: autoUpdateUcpToggle.checked,
 			autoUpdateUcpTab: autoUpdateUcpTabToggle.checked,
 			autoUpdateOnlySound: onlySoundToggle.checked,
-            autoUpdateUcpTimeout: Number(updateIntervalSelect.value) * 60,
+            autoUpdateUcpTimeout: Number(updateIntervalSelect.value),
             autoUpdateNotifySound: soundSelect.value,
 			AutoUpdateNotifySoundVolume: Number(volumeSlider.value),
 			quietHoursEnabled: quietHoursToggle.checked,

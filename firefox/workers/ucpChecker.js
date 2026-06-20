@@ -43,20 +43,15 @@ const UCP_URL = "https://admin.gambit-rp.com/ucp";
 let autoUpdateUcpInterval = null;
 
 async function updateTimer() {
-  const storage = await browser.storage.sync.get([ "autoUpdateUcp", "autoUpdateUcpTimeout", ]);
-	const autoUpdateUcp = storage.autoUpdateUcp ?? false;
-	const autoUpdateUcpTimeout = storage.autoUpdateUcpTimeout ?? 300;
+  const storage = await browser.storage.sync.get(["autoUpdateUcp", "autoUpdateUcpTimeout"]);
+  const autoUpdateUcp = storage.autoUpdateUcp ?? false;
+  const autoUpdateUcpTimeout = storage.autoUpdateUcpTimeout ?? 5;
 
-    if (autoUpdateUcpInterval) {
-        clearInterval(autoUpdateUcpInterval);
-        autoUpdateUcpInterval = null;
-    }
+  await browser.alarms.clear("ucpCheck");
 
-    if (autoUpdateUcp) {
-        autoUpdateUcpInterval = setInterval(() => {
-            checkUcp();
-        }, autoUpdateUcpTimeout * 1000);
-    }
+  if (!autoUpdateUcp) { return; }
+
+  browser.alarms.create("ucpCheck", { periodInMinutes: autoUpdateUcpTimeout });
 }
 
 async function checkUcp() {
@@ -92,29 +87,20 @@ async function checkUcp() {
 
 	const response = await fetch(UCP_URL, { credentials: "include" });
 
-	if (!response.ok) return console.warn("[UCP] Ошибка запроса, пропуск проверки");
+	if (!response.ok) { return; }
 
 	const html = await response.text();
-	const parser = new DOMParser();
-	const doc = parser.parseFromString(html, "text/html");
+	const match = html.match(/Персонажи[\s\S]*?<span[^>]*style=["'][^"']*font-size:\s*10px[^"']*["'][^>]*>(\d+)<\/span>/);
 
-	const menuItems = [...doc.querySelectorAll("a.dropdown-toggle")];
-	const charactersItem = menuItems.find(a => a.textContent.includes("Персонажи"));
+  if (!match) return;
 
-	if (!charactersItem) return console.warn("[UCP] Пункт 'Персонажи' не найден");
+  const value = parseInt(match[1], 10);
 
-	const counterSpan = charactersItem.querySelector('span[style*="font-size: 10px"]');
-	if (!counterSpan) return console.warn("[UCP] Счетчик в пункте 'Персонажи' не найден");
-
-	const value = parseInt(counterSpan.textContent.trim(), 10);
-
-	if (!value || value === 0) return
+  if (!value || value === 0) return;
 	
 	if (autoUpdateUcpTab) {
 		const tabs = await browser.tabs.query({ url: ["https://admin.gambit-rp.com/ucp", "https://admin.gambit-rp.com/ucp/"] });
-		if (tabs.length > 0) {
-			for (const tab of tabs) { browser.tabs.reload(tab.id); }
-		}
+		for (const tab of tabs) { browser.tabs.reload(tab.id); }
 	}
 	
 	if (!inQuietHours && !quietEnabled) {
@@ -129,104 +115,104 @@ async function sendNotification(text) {
 		AutoUpdateNotifySoundVolume = 75
 	} = await browser.storage.sync.get(["autoUpdateOnlySound", "autoUpdateNotifySound", "AutoUpdateNotifySoundVolume"]);
 
-    if (autoUpdateOnlySound) {
-        const audio = new Audio(browser.runtime.getURL(`media/sounds/${autoUpdateNotifySound}`));
-		audio.volume = AutoUpdateNotifySoundVolume / 100;
-        audio.play().catch(() => console.warn("[UCP] Не удалось воспроизвести звук"));
-    } else {
-        browser.notifications.create({
-            type: "basic",
-            iconUrl: "icons/logo.png",
-            title: "UCP Helper",
-            message: text
-        });
-    }
+  if (autoUpdateOnlySound) {
+    const audio = new Audio(browser.runtime.getURL(`media/sounds/${autoUpdateNotifySound}`));
+    audio.volume = AutoUpdateNotifySoundVolume / 100;
+    audio.play().catch(() => {});
+  } else {
+    browser.notifications.create({
+      type: "basic",
+      iconUrl: "icons/logo.png",
+      title: "UCP Helper",
+      message: text
+    });
+  }
 }
 
-browser.runtime.onInstalled.addListener(() => {
-    updateTimer();
+browser.runtime.onInstalled.addListener(async () => {
+  await updateTimer();
 });
 
-browser.runtime.onStartup.addListener(() => {
-    updateTimer();
+browser.runtime.onStartup.addListener(async () => {
+  await updateTimer();
+  const alarm = await browser.alarms.get("ucpCheck");
 });
 
-browser.storage.onChanged.addListener((changes, area) => {
-    updateTimer();
+browser.storage.onChanged.addListener(async (changes, area) => {
+  if (area !== "sync") return;
+
+  if (changes.autoUpdateUcp || changes.autoUpdateUcpTimeout) {
+    await updateTimer();
+  }
 });
 
-browser.alarms.onAlarm.addListener((alarm) => {
-	if (alarm.name === "versionCheck") {
-		checkExtensionUpdate();
-	}
-	if (alarm.name === "ucpCheck") {
-		checkUcp();
-	}
-});
+browser.alarms.onAlarm.addListener(async (alarm) => {
+  switch (alarm.name) {
+    case "versionCheck":
+      await checkExtensionUpdate();
+      break;
 
+    case "ucpCheck":
+      await checkUcp();
+      break;
+  }
+});
 
 browser.tabs.onUpdated.addListener(async (tabId, info, tab) => {
   if (!tab.url?.startsWith(UCP_URL)) return;
   if (info.status !== "complete") return;
 
-  try {
-    const res = await fetch(
-      `https://api.github.com/repos/${REPO}/releases/latest`
-    );
+  const res = await fetch(`https://api.github.com/repos/${REPO}/releases/latest`);
 
-    if (!res.ok) return;
+  if (!res.ok) return;
 
-    const data = await res.json();
+  const data = await res.json();
 
-    const latestVersion = data.tag_name;
-    const currentVersion = chrome.runtime.getManifest().version;
+  const latestVersion = data.tag_name;
+  const currentVersion = chrome.runtime.getManifest().version;
 
-    const isNew = compareVersions(latestVersion, currentVersion) > 0;
+  const isNew = compareVersions(latestVersion, currentVersion) > 0;
 
-    if (!isNew) return;
+  if (!isNew) return;
 
-    browser.scripting.executeScript({
-      target: { tabId },
-      func: (version) => {
-        if (document.getElementById("ucp-update-modal")) return;
+  browser.scripting.executeScript({
+    target: { tabId },
+    func: (version) => {
+      if (document.getElementById("ucp-update-modal")) return;
 
-        const overlay = document.createElement("div");
-        overlay.id = "ucp-update-modal";
-        overlay.className = "ucp-modal-overlay";
+      const overlay = document.createElement("div");
+      overlay.id = "ucp-update-modal";
+      overlay.className = "ucp-modal-overlay";
 
-        overlay.innerHTML = `
-          <div class="ucp-modal-content">
-            <div class="ucp-modal-title">UCP Helper</div>
-            <div class="ucp-modal-subtitle">Доступно обновление</div>
+      overlay.innerHTML = `
+        <div class="ucp-modal-content">
+          <div class="ucp-modal-title">UCP Helper</div>
+          <div class="ucp-modal-subtitle">Доступно обновление</div>
 
-            <div class="ucp-modal-text">
-              Доступна новая версия расширения <b>${version}</b><br><br>
+          <div class="ucp-modal-text">
+            Доступна новая версия расширения <b>${version}</b><br><br>
 
-              <a 
-                href="https://github.com/mayjann/ucphelper/releases/latest"
-                target="_blank"
-                style="color:#4dabf7;text-decoration:underline"
-              >
-                Перейти на страницу релиза
-              </a>
-            </div>
-
-            <button class="ucp-modal-btn" id="ucpUpdateCloseBtn">
-              Закрыть
-            </button>
+            <a 
+              href="https://github.com/mayjann/ucphelper/releases/latest"
+              target="_blank"
+              style="color:#4dabf7;text-decoration:underline"
+            >
+              Перейти на страницу релиза
+            </a>
           </div>
-        `;
 
-        document.body.appendChild(overlay);
+          <button class="ucp-modal-btn" id="ucpUpdateCloseBtn">
+            Закрыть
+          </button>
+        </div>
+      `;
 
-        document.getElementById("ucpUpdateCloseBtn").onclick = () => {
-          overlay.remove();
-        };
-      },
-      args: [latestVersion]
-    });
+      document.body.appendChild(overlay);
 
-  } catch (err) {
-    console.error("[UCP] update check error:", err);
-  }
+      document.getElementById("ucpUpdateCloseBtn").onclick = () => {
+        overlay.remove();
+      };
+    },
+    args: [latestVersion]
+  });
 });
