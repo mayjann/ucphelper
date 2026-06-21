@@ -7,6 +7,7 @@ async function checkers() {
     const isUcpPage = /^\/ucp\/\d+$/.test(location.pathname);
     const isRequestPage = location.pathname.startsWith("/requests");
 
+    UI.hideNativeLoader();
     if (!isUcpPage && !isRequestPage) return;
 
     const needLoader = isUcpPage;

@@ -6,6 +6,11 @@ import { showToast } from "./toast.js";
 
 let tooltipElem = null;
 
+export function hideNativeLoader() {
+    const loader = document.getElementById("loader");
+    if (loader) { loader.classList.add("fadeOut"); }
+}
+
 export function createBadge(text, colorClass, link = null) {
     const badge = document.createElement("span");
     badge.className = `ucp-nick-badge ${colorClass}`;
@@ -60,8 +65,8 @@ async function createSendNewbieRequest(characterName) {
     }
 }
 
-async function createSendRequest(comment) {
-    const ok = await sendRequest({comment: comment});
+async function createSendRequest(player_nick, comment) {
+    const ok = await sendRequest({player_nick: player_nick, comment: comment});
 
     if (ok) {
         showToast("Запрос успешно создан", "success");
@@ -100,7 +105,7 @@ export function createNewRequestButton(ucpLink, lk, regDate, isNew, displayDate,
                 const tpl = storage.ppTemplate ?? DEFAULT_SETTINGS.ppTemplate;
                 const comment = renderPpTemplate(tpl, ucpLink, lk);
 
-                await createSendRequest(comment);
+                await createSendRequest(characterName, comment);
 
                 const popup = document.createElement('div');
                 popup.className = "ucp-copy-popup";

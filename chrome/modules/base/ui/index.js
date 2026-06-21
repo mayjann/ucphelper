@@ -6,6 +6,7 @@ import * as CopyButton from "./requestsCopyButton.js"
 import * as Toast from "./toast.js"
 
 export class UI {
+    static hideNativeLoader = Core.hideNativeLoader;
     static createBadge = Core.createBadge;
     static createGoogleLink = Core.createGoogleLink;
     static createNewRequestButton = Core.createNewRequestButton;
