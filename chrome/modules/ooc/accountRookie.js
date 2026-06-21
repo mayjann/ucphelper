@@ -15,7 +15,8 @@ export async function getFirstPlayerRegDate() {
         let displayDate = "Новорег";
         let lkValue = null;
         let oocTable = null;
-        
+        let characterName = null;
+
         const tables = document.querySelectorAll('table.table.table-bordered');
 
         const targetTable = Array.from(tables).find(table => {
@@ -73,6 +74,20 @@ export async function getFirstPlayerRegDate() {
         }
 
         for (const table of tables) {
+            if (!characterName) {
+                const icHeader = table.querySelector('thead th[colspan="2"]');
+
+                if (icHeader?.textContent.includes("IC информация")) {
+                    const nameRow = table.querySelector("tr#name");
+                    const td = nameRow?.querySelector("td");
+                    const nickCode = td?.querySelector("code");
+
+                    if (nickCode) {
+                        characterName = nickCode.textContent.trim();
+                    }
+                }
+            }
+
             if (!oocTable && table.querySelector('thead th[colspan="2"]')?.textContent.includes('OOC информация')) {
                 oocTable = table;
             }
@@ -90,9 +105,17 @@ export async function getFirstPlayerRegDate() {
             }
         }
 
+
         if (!oocTable || !lkValue) {
-            return { playerId, lkValue, regDate, isNew };
+            return {
+                playerId,
+                lkValue,
+                regDate,
+                isNew,
+                characterName
+            };
         }
+
 
         for (const row of oocTable.querySelectorAll('tbody tr')) {
             const th = row.querySelector('th');
@@ -109,21 +132,30 @@ export async function getFirstPlayerRegDate() {
                         lkValue,
                         regDate,
                         isNew,
-                        displayDate
+                        displayDate,
+                        characterName
                     )
                 );
                 break;
             }
         }
 
-        return { playerId, lkValue, regDate, isNew };
+
+        return {
+            playerId,
+            lkValue,
+            regDate,
+            isNew,
+            characterName
+        };
 
     } catch (error) {
         return {
             playerId: null,
             lkValue: null,
             regDate: "Новорег",
-            isNew: true
+            isNew: true,
+            characterName: null
         };
     }
 }

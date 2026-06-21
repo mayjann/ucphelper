@@ -10,6 +10,11 @@ export function startObserver(checkers) {
             !node.children.length &&
             !node.textContent.trim()
         ) ||
+        node?.classList?.contains("notranslate") ||
+        node?.classList?.contains("toast") ||
+        node?.id === "customTemplateSelectWrapper" ||
+        node?.id === "customTemplateWarning" ||
+        node?.id === "toastContainer" ||
         node?.closest?.(".nav-item.dropdown") ||
         node?.matches?.(".nav-item.dropdown") ||
         node?.querySelector?.(".nav-item.dropdown") ||
@@ -38,7 +43,6 @@ export function startObserver(checkers) {
 
         for (const mutation of mutations) {
             for (const node of mutation.addedNodes) {
-
                 if (!(node instanceof HTMLElement)) continue;
 
                 if (isIgnored(node)) continue;

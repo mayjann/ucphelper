@@ -43,6 +43,8 @@ export const DEFAULT_SETTINGS = {
     quietHoursEnabled: false,
     quietHours: { from: "23:00", to: "08:00" },
     quietEnabled: false,
+    useGNew: false,
+    gNewApiKey: "",
     templates: {
         6: 'Пожалуйста, не используйте имя знаменитостей',
         10: 'Пожалуйста, перепиши квенту: укажи слабые/сильные стороны, страхи, хобби и развлечения и другое',
@@ -92,6 +94,12 @@ export async function initDefaults(storage) {
 
     if (storage.ppTemplate === undefined)
         defaultsToSet.ppTemplate = DEFAULT_SETTINGS.ppTemplate;
+
+    if (storage.useGNew === undefined)
+        defaultsToSet.useGNew = DEFAULT_SETTINGS.useGNew;
+
+    if (storage.gNewApiKey === undefined)
+        defaultsToSet.gNewApiKey = DEFAULT_SETTINGS.gNewApiKey;
 
     if (Object.keys(defaultsToSet).length > 0) {
         await chrome.storage.sync.set(defaultsToSet);

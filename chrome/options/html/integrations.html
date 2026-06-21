@@ -1,0 +1,42 @@
+<section class="card">
+
+	<h2>G-NEW</h2>
+
+	<div class="toggles">
+
+		<label class="switch">
+			<input type="checkbox" id="useGNew">
+			<span class="slider"></span>
+			<span class="toggle-text">Включить интеграцию с G-NEW</span>
+		</label>
+
+	</div>
+
+	<div id="gNewSettings" style="display:none; margin-top:15px;">
+
+		<p style="margin-bottom:6px;">
+			API ключ G-NEW
+		</p>
+
+		<input 
+			type="password" 
+			id="gNewApiKey" 
+			class="textareaSec"
+			placeholder="Введите API ключ"
+		>
+
+		<small style="opacity:.7;">
+			Ключ используется для автоматического добавления новичков в G-NEW.<br>
+			Получить токен можно в личном кабинете на сайте 
+			<a href="https://g-new.ru/" target="_blank" rel="noopener noreferrer">
+				G-NEW
+			</a>.
+		</small>
+
+	</div>
+
+</section>
+
+<section class="card">
+	<button id="saveIntegrationsBtn" class="btn btn-primary">Сохранить</button>
+</section>

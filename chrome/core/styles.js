@@ -378,6 +378,44 @@ export function injectStyles() {
             overflow-y: auto;
             overflow-x: hidden;
         }
+
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            min-width: 240px;
+            padding: 12px 16px;
+            color: #e0e6f0;
+            border-left: 4px solid #2196f3;
+            border-radius: 8px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+            font-size: 14px;
+            opacity: 0;
+            transform: translateX(20px);
+            transition: 0.25s ease;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            border-left-color: #4caf50;
+            background-color: #005303;
+        }
+
+        .toast.error {
+            border-left-color: #f44336;
+            background-color: #520500;
+        }
     `;
     document.head.appendChild(style);
 }

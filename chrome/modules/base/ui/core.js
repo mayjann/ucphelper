@@ -1,4 +1,6 @@
 import { DEFAULT_SETTINGS } from "../../../core/config.js"
+import { sendNewbie } from "../../../core/utils/sendNewbie.js";
+import { showToast } from "./toast.js";
 
 let tooltipElem = null;
 
@@ -36,7 +38,27 @@ export function showBanPopup(reasonText) {
     banAlertShown = true;
 }
 
-export function createNewRequestButton(ucpLink, lk, regDate, isNew, displayDate) {
+async function createSendNewbieRequest(characterName) {
+    const storage = await chrome.storage.sync.get(["useGNew", "gNewApiKey"]);
+
+    if (!storage.useGNew) return;
+
+    if (!storage.gNewApiKey) {
+        showToast("G-NEW: API ключ не указан", "error");
+        return;
+    }
+
+    const KEY = storage.gNewApiKey;
+    const result = await sendNewbie(KEY, characterName);
+
+    if (result.status === 201) {
+        showToast(`G-NEW: ${result.data.message ?? "Новичок успешно добавлен"}`, "success");
+    } else {
+        showToast(`G-NEW: ${result.data.error ?? "Неизвестная ошибка"}`, "error");
+    }
+}
+
+export function createNewRequestButton(ucpLink, lk, regDate, isNew, displayDate, characterName) {
     const btn = document.createElement('button');
 
     btn.className = "ucp-request-btn";
@@ -61,6 +83,7 @@ export function createNewRequestButton(ucpLink, lk, regDate, isNew, displayDate)
     if (isNew) {
         btn.onclick = async () => {
             try {
+                createSendNewbieRequest(characterName);
                 const storage = await chrome.storage.sync.get(["ppTemplate"]);
                 const tpl = storage.ppTemplate ?? DEFAULT_SETTINGS.ppTemplate;
                 await navigator.clipboard.writeText(renderPpTemplate(tpl, ucpLink, lk));

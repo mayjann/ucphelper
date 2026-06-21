@@ -37,6 +37,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 case "шаблоны":
                     loadSection("options/html/templates.html");
                     break;
+
+                case "интеграции":
+                    loadSection("options/html/integrations.html");
+                    break;
             }
         });
     });
