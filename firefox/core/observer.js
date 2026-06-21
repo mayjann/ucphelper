@@ -43,18 +43,9 @@ export function startObserver(checkers) {
 
         for (const mutation of mutations) {
             for (const node of mutation.addedNodes) {
-
                 if (!(node instanceof HTMLElement)) continue;
 
                 if (isIgnored(node)) continue;
-
-                console.log("[Observer Trigger]", {
-                    tag: node.tagName,
-                    id: node.id,
-                    classes: node.className,
-                    text: node.textContent.trim().slice(0, 100),
-                    element: node
-                });
 
                 lastRun = now;
 
