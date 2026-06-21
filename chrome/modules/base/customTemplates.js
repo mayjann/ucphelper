@@ -1,4 +1,4 @@
-export function CustomTemplateWatcher() {
+export function customTemplateWatcher() {
 	let customSelectEl = null;
 	let warningEl = null;
 
