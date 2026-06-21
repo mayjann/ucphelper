@@ -27,7 +27,7 @@ function applyBadges(result) {
             const logs = data.logs || [];
 
             const activeBan = (data.punishment || []).find(p =>
-                p.type === "accban" || p.type === "ban"
+                p.type === "accban" || p.type === "ban" || p.type === "iban"
             );
 
             const content = Array.from(nameCell.childNodes);
@@ -47,9 +47,24 @@ function applyBadges(result) {
                     reason: activeBan.reason || "Perm"
                 };
 
+                const banType = activeBan.type;
+
+                let badgeText = "BAN";
+                let badgeClass = "ucp-tb-temp";
+
+                if (banType === "iban") {
+                    badgeText = "PERMANENT";
+                    badgeClass = "ucp-tb-perm";
+                }
+
+                if (banType === "accban") {
+                    badgeText = "ACCBAN";
+                    badgeClass = "ucp-tb-accban";
+                }
+
                 const badge = UI.createModalBadge({
-                    text: "PERMANENT",
-                    bgClass: "ucp-tb-perm",
+                    text: badgeText,
+                    bgClass: badgeClass,
                     mode: "ban",
                     data: bestLog,
                     history: logs
@@ -62,7 +77,7 @@ function applyBadges(result) {
             else if (logs.length) {
                 const badge = UI.createModalBadge({
                     text: "ИСТОРИЯ БЛОКИРОВОК",
-                    bgClass: "ucp-tb-temp",
+                    bgClass: "ucp-tb-history",
                     mode: "history",
                     player: name,
                     history: logs
