@@ -3,6 +3,7 @@ import * as Modal from "./modal.js";
 import * as Widget from "./widget.js";
 import * as Loader from "./loader.js";
 import * as CopyButton from "./requestsCopyButton.js"
+import * as Toast from "./toast.js"
 
 export class UI {
     static createBadge = Core.createBadge;
@@ -16,4 +17,5 @@ export class UI {
     static showLoader = Loader.showLoader;
     static hideLoader = Loader.hideLoader;
     static makeLcClickable = CopyButton.makeLcClickable;
+    static showToast = Toast.showToast
 }

@@ -43,6 +43,8 @@ export const DEFAULT_SETTINGS = {
     quietHoursEnabled: false,
     quietHours: { from: "23:00", to: "08:00" },
     quietEnabled: false,
+    useGNew: false,
+    gNewApiKey: "",
     templates: {
         6: 'Пожалуйста, не используйте имя знаменитостей',
         10: 'Пожалуйста, перепиши квенту: укажи слабые/сильные стороны, страхи, хобби и развлечения и другое',
