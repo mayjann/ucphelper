@@ -5,6 +5,8 @@ import * as WikiChecks from "./wiki.js";
 import * as DomainChecks from "./domains.js";
 import * as BadWords from "./badWords.js";
 import * as sendNewbie from "./sendNewbie.js";
+import * as sendRequest from "./sendRequest.js";
+
 
 export class Utils {
     static checkBadWords = StringChecks.checkBadWords;
@@ -23,4 +25,5 @@ export class Utils {
     static loadDisposableDomains = DomainChecks.loadDisposableDomains;
     static loadUserBadWords = BadWords.loadUserBadWords;
     static sendNewbie = sendNewbie.sendNewbie;
+    static sendRequest = sendRequest.sendRequest;
 }

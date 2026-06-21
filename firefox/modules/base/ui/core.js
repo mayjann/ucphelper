@@ -1,8 +1,15 @@
 import { DEFAULT_SETTINGS } from "../../../core/config.js"
 import { sendNewbie } from "../../../core/utils/sendNewbie.js";
+import { sendRequest } from "../../../core/utils/sendRequest.js";
 import { showToast } from "./toast.js";
 
+
 let tooltipElem = null;
+
+export function hideNativeLoader() {
+    const loader = document.getElementById("loader");
+    if (loader) { loader.classList.add("fadeOut"); }
+}
 
 export function createBadge(text, colorClass, link = null) {
     const badge = document.createElement("span");
@@ -58,6 +65,16 @@ async function createSendNewbieRequest(characterName) {
     }
 }
 
+async function createSendRequest(player_nick, comment) {
+    const ok = await sendRequest({player_nick: player_nick, comment: comment});
+
+    if (ok) {
+        showToast("Запрос успешно создан", "success");
+    } else {
+        showToast("Ошибка создания запроса", "error");
+    }
+}
+
 export function createNewRequestButton(ucpLink, lk, regDate, isNew, displayDate, characterName) {
     const btn = document.createElement('button');
 
@@ -86,7 +103,9 @@ export function createNewRequestButton(ucpLink, lk, regDate, isNew, displayDate,
                 createSendNewbieRequest(characterName);
                 const storage = await chrome.storage.sync.get(["ppTemplate"]);
                 const tpl = storage.ppTemplate ?? DEFAULT_SETTINGS.ppTemplate;
-                await navigator.clipboard.writeText(renderPpTemplate(tpl, ucpLink, lk));
+                const comment = renderPpTemplate(tpl, ucpLink, lk);
+
+                await createSendRequest(characterName, comment);
 
                 const popup = document.createElement('div');
                 popup.className = "ucp-copy-popup";
