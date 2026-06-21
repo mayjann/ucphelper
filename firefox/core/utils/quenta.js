@@ -28,7 +28,7 @@ export function checkQuentaConstructed(text) {
     for (const part of parts) {
         if (normalized.includes(part)) {
             matches++;
-            if (matches > 2) return true;
+            if (matches >= 2) return true;
         }
     }
 
