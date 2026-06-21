@@ -36,7 +36,7 @@ export const DEFAULT_SETTINGS = {
     autoUpdateUcpTab: true,
     autoUpdateUcp: false,
     autoUpdateUcpTab: true,
-    autoUpdateUcpTimeout: 300,
+    autoUpdateUcpTimeout: 5,
     autoUpdateOnlySound: false,
     AutoUpdateNotifySound: NOTIFY_SOUNDS[1].file,
     AutoUpdateNotifySoundVolume: 75,

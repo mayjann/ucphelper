@@ -10,6 +10,11 @@ export function startObserver(checkers) {
             !node.children.length &&
             !node.textContent.trim()
         ) ||
+        node?.classList?.contains("notranslate") ||
+        node?.classList?.contains("toast") ||
+        node?.id === "customTemplateSelectWrapper" ||
+        node?.id === "customTemplateWarning" ||
+        node?.id === "toastContainer" ||
         node?.closest?.(".nav-item.dropdown") ||
         node?.matches?.(".nav-item.dropdown") ||
         node?.querySelector?.(".nav-item.dropdown") ||
@@ -42,6 +47,14 @@ export function startObserver(checkers) {
                 if (!(node instanceof HTMLElement)) continue;
 
                 if (isIgnored(node)) continue;
+
+                console.log("[Observer Trigger]", {
+                    tag: node.tagName,
+                    id: node.id,
+                    classes: node.className,
+                    text: node.textContent.trim().slice(0, 100),
+                    element: node
+                });
 
                 lastRun = now;
 
